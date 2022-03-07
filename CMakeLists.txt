@@ -13,8 +13,11 @@ set(sources
         res/scripts/ui/Button.h
         res/scripts/ui/UIElement.cpp
         res/scripts/ui/UIElement.h
-        res/scripts/managers/TextureManager.cpp
-        res/scripts/managers/TextureManager.h res/scripts/managers/UIElementManager.cpp res/scripts/managers/UIElementManager.h)
+        res/scripts/managers/AssetManager.cpp
+        res/scripts/managers/AssetManager.h
+        res/scripts/managers/UIElementManager.cpp
+        res/scripts/managers/UIElementManager.h
+        res/scripts/ui/SpriteBased.cpp res/scripts/ui/SpriteBased.h res/scripts/ui/TextBased.cpp res/scripts/ui/TextBased.h)
 
 add_executable(SVDCompression ${sources})
 target_link_libraries(SVDCompression sfml-system sfml-window sfml-graphics sfml-network sfml-audio)

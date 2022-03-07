@@ -1,0 +1,78 @@
+#pragma once
+
+//INCLUDE STATEMENTS:
+#include <iostream>
+#include <string>
+#include <map>
+#include <SFML/Graphics.hpp>
+
+//USING STATEMENTS:
+using std::string;
+using std::map;
+using std::pair;
+using std::out_of_range;
+using std::cout;
+using std::endl;
+using std::cerr;
+
+using sf::Texture;
+using sf::Font;
+
+//CONSTANTS:
+static const string MISSING_TEXTURE = "_missingtexture.png";
+static const string DEFAULT_FONT = "OpenSans-Regular400.ttf";
+
+/// @class Static class that Handles asset loading and assignment for the entire application.
+/// Includes textures and fonts.
+class AssetManager {
+
+    static map<string,Texture> textures; ///< Texture map for easy access using the name of the texture.
+    static string textureFolder; ///< Location of the texture folder.
+
+    static map<string, Font> fonts; ///< Font map for easy access using the name of the font.
+    static string fontFolder; ///< Location of the font folder.
+
+public:
+    /// Default Constructor.
+    /// Generates the AssetManager class with the default texture location prefix + "res/textures".
+    /// Also creates a missing texture for later use.
+    /// @param prefix the path from the executable to the folder containing res/. The default is a blank string.
+    /// @warning requires that the missing texture and default font exist within res/textures and res/fonts.
+    explicit AssetManager(const string& prefix = "");
+
+    /* * * * * * * * * * *
+     * TEXTURE FUNCTIONS *
+     * * * * * * * * * * */
+
+    /// Adds the texture with the specified name to the asset manager.
+    /// @param textureName the filename of the texture to be added.
+    /// @returns true if the texture was successfully added.
+    static bool addTexture(const string& textureName);
+
+    /// Accessor for the texture map.
+    /// @param textureName the filename of the target texture.
+    /// @returns a reference to the texture in the map if it exists. Otherwise, it returns the missing texture.
+    static const Texture& getTexture(const string& textureName);
+
+    /* * * * * * * * * *
+     * FONT  FUNCTIONS *
+     * * * * * * * * * */
+
+    /// Adds the font with the specified name to the asset manager.
+    /// @param fontName the filename of the font to be added.
+    /// @returns true if the font was successfully added.
+    static bool addFont(const string& fontName);
+
+    /// Accessor for the font map.
+    /// @param fontName the filename of the target texture.
+    /// @returns a reference to the font in the map if it exists. Otherwise, it returns the default font.
+    static const Font& getFont(const string& fontName);
+
+    /* * * * * * * * * * * *
+     * SERIALIZE FUNCTIONS *
+     * * * * * * * * * * * */
+
+    static void loadAllTextures();
+    static void loadALlFonts();
+
+};
