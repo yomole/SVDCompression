@@ -99,5 +99,38 @@ const Font &AssetManager::getFont(const string &fontName){
     catch (std::out_of_range& out_of_range2){
         throw std::invalid_argument("[Asset Manager] FATAL! Default font was not found! Stopping program...");
     }
+}
 
+void AssetManager::loadAll(){
+    cout << "Loading textures..." << endl;
+
+    //1. Construct a directory iterator with the file path for textures
+    fs::directory_iterator textureIter((fs::path(textureFolder)));
+
+    //2. For each file in the directory, add the texture to the asset manager.
+    for (const auto &file : textureIter){
+        cout << "\t- " << file.path();
+        if (addTexture(file.path().filename().string())){
+            cout << " loaded!" << endl;
+        }
+        else{
+            cout << " was already loaded!" << endl;
+        }
+    }
+
+    cout << "Loading fonts..." << endl;
+
+    //3. Construct a directory iterator with the file path for fonts.
+    fs::directory_iterator fontIter((fs::path(fontFolder)));
+
+    //4. For each file in the directory, add the font to the asset manager.
+    for (const auto &file : fontIter){
+        cout << "\t- " << file.path();
+        if (addFont(file.path().filename().string())){
+            cout << " loaded!" << endl;
+        }
+        else{
+            cout << " was already loaded!" << endl;
+        }
+    }
 }

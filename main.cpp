@@ -19,9 +19,7 @@ int main() {
     AssetManager textureManager("../"); //Make a texture manager with the right prefix for CLion.
     UIElementManager uiElementManager(&window);
 
-    AssetManager::addTexture("test.png");
-    AssetManager::addTexture("testPressed.png");
-    AssetManager::addFont("OpenSans-Regular400-Italics.ttf");
+    AssetManager::loadAll();
 
     Button button("Dr. Disco", AssetManager::getTexture("test.png"), Vector2f(0, 0), [&button]()->void{
         cout << button.getName() << " is changing colors!" << endl;

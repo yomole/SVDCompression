@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <map>
+#include <filesystem>
 #include <SFML/Graphics.hpp>
 
 //USING STATEMENTS:
@@ -14,6 +15,8 @@ using std::out_of_range;
 using std::cout;
 using std::endl;
 using std::cerr;
+
+namespace fs = std::filesystem;
 
 using sf::Texture;
 using sf::Font;
@@ -72,7 +75,6 @@ public:
      * SERIALIZE FUNCTIONS *
      * * * * * * * * * * * */
 
-    static void loadAllTextures();
-    static void loadALlFonts();
+    static void loadAll();
 
 };
