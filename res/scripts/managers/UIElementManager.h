@@ -16,7 +16,7 @@ using sf::Mouse;
 using sf::Vector2i;
 using sf::Vector2f;
 
-/// @class Static class that handles each UI element in the application.
+///Handles each UI element in the application.
 class UIElementManager {
     static RenderWindow* window; ///< The pointer to the renderwindow object used for the application.
     static forward_list<SpriteBased*> elements; ///< Stores the elements in a map for easy access using the name of the element.

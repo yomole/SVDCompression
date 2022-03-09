@@ -14,7 +14,3 @@ const Texture& SpriteBased::getBaseTexture() const{
 Sprite& SpriteBased::getSprite(){
     return this->sprite;
 }
-
-void SpriteBased::setTexture(const Texture& texture){
-    sprite.setTexture(texture, true);
-}
