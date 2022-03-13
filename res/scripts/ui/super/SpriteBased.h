@@ -12,8 +12,10 @@ using sf::Sprite;
 class SpriteBased : public UIElement{
 
 protected:
+
     Texture baseTexture; ///<Initial texture for the UI Element.
     Sprite sprite; ///<Sprite of the UI Element.
+
 public:
 
     /// @brief Default Constructor. Creates the Sprite-based UI element.

@@ -5,7 +5,8 @@
 #include "res/scripts/managers/AssetManager.h"
 #include "res/scripts/managers/UIElementManager.h"
 #include "res/scripts/ui/Button.h"
-#include "res/scripts/ui/TextBased.h"
+#include "res/scripts/ui/super/TextBased.h"
+#include "res/scripts/ui/ProgressBar.h"
 
 using namespace std;
 using sf::Event;
@@ -21,13 +22,17 @@ int main() {
 
     AssetManager::loadAll();
 
-    Button button("Dr. Disco", AssetManager::getTexture("test.png"), Vector2f(0, 0), [&button]()->void{
-        cout << button.getName() << " is changing colors!" << endl;
+    ProgressBar* progress = new ProgressBar("Progress Bar Test", Vector2f(200, 20), Vector2f(300,200));
+
+    Button button("Dr. Disco", AssetManager::getTexture("test.png"), Vector2f(0, 0), [&button, &progress]()->void{
         button.getSprite().setColor(sf::Color(rand()%256, rand()%256, rand()%256));
+        cout << "Progress bar ( " << &(*progress) << ") percentage went from " << progress->getPercentage();
+        progress->setPercentage(progress->getPercentage() + .05);
+        cout << " to " << progress->getPercentage() << endl;
     });
 
     Button button2("Press button test", AssetManager::getTexture("test.png"), Vector2f(256, 256), [&button2]()->void{
-        button2.setTexture(AssetManager::getTexture("testPressed.png"));
+        button2.getSprite().setTexture(AssetManager::getTexture("testPressed.png"));
     });
 
     Button button3("Missing texture test", AssetManager::getTexture("test2.png"), Vector2f(128, 0), [&button3]()->void{
@@ -63,6 +68,11 @@ int main() {
 
         window.clear(sf::Color::White);
         UIElementManager::drawAll();
+
+        for (RectangleShape* i : progress->getShapes()){
+            window.draw(*i);
+        }
+
         window.display();
     }
 

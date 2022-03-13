@@ -5,8 +5,8 @@
 #include <string>
 #include <functional>
 
-#include "UIElement.h"
-#include "SpriteBased.h"
+#include "super/UIElement.h"
+#include "super/SpriteBased.h"
 
 //USING STATEMENTS:
 using std::function;

@@ -4,8 +4,8 @@
 #include <forward_list>
 #include <SFML/Graphics.hpp>
 #include <iostream>
-#include "../ui/SpriteBased.h"
-#include "../ui/TextBased.h"
+#include "../ui/super/SpriteBased.h"
+#include "../ui/super/TextBased.h"
 
 //USING STATEMENTS:
 using std::forward_list;

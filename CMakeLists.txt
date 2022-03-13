@@ -11,13 +11,18 @@ set(sources
         main.cpp
         res/scripts/ui/Button.cpp
         res/scripts/ui/Button.h
-        res/scripts/ui/UIElement.cpp
-        res/scripts/ui/UIElement.h
+        res/scripts/ui/super/UIElement.cpp
+        res/scripts/ui/super/UIElement.h
         res/scripts/managers/AssetManager.cpp
         res/scripts/managers/AssetManager.h
         res/scripts/managers/UIElementManager.cpp
         res/scripts/managers/UIElementManager.h
-        res/scripts/ui/SpriteBased.cpp res/scripts/ui/SpriteBased.h res/scripts/ui/TextBased.cpp res/scripts/ui/TextBased.h)
+        res/scripts/ui/super/SpriteBased.cpp
+        res/scripts/ui/super/SpriteBased.h
+        res/scripts/ui/super/TextBased.cpp
+        res/scripts/ui/super/TextBased.h
+        res/scripts/ui/ProgressBar.cpp
+        res/scripts/ui/ProgressBar.h)
 
 add_executable(SVDCompression ${sources})
 target_link_libraries(SVDCompression sfml-system sfml-window sfml-graphics sfml-network sfml-audio)
