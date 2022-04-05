@@ -22,7 +22,7 @@ set(sources
         res/scripts/ui/super/TextBased.cpp
         res/scripts/ui/super/TextBased.h
         res/scripts/ui/ProgressBar.cpp
-        res/scripts/ui/ProgressBar.h)
+        res/scripts/ui/ProgressBar.h res/scripts/commands/Commands.cpp res/scripts/commands/Commands.h)
 
 add_executable(SVDCompression ${sources})
 target_link_libraries(SVDCompression sfml-system sfml-window sfml-graphics sfml-network sfml-audio)
