@@ -37,7 +37,8 @@ int main(int argc, char* argv[]) {
 
         AssetManager::loadAll();
 
-        ProgressBar *progress = new ProgressBar("Progress Bar Test", Vector2f(200, 20), Vector2f(300, 200));
+        //TODO: Make progress bar entities part of the asset manager to avoid memory leaks!
+        auto *progress = new ProgressBar("Progress Bar Test", Vector2f(200, 20), Vector2f(300, 200));
 
         Button button("Dr. Disco", AssetManager::getTexture("test.png"), Vector2f(0, 0),
                       [&button, &progress]() -> void {
@@ -58,7 +59,7 @@ int main(int argc, char* argv[]) {
                            button3.getSprite().setTexture(AssetManager::getTexture("tested.png"));
                        });
 
-        TextBased testText("testing text", Vector2f(40, 150), AssetManager::getFont(DEFAULT_FONT), "Hello World!");
+        TextBased testText("testing text", Vector2f(40, 150), AssetManager::getFont(DEFAULT_FONT.data()), "Hello World!");
 
         UIElementManager::addElement(&button);
         UIElementManager::addElement(&button2);
@@ -120,16 +121,25 @@ int main(int argc, char* argv[]) {
                     getHelp(ADD);
                 }
                 else{
-
+                    AssetManager::addFile(args.at(0));
                 }
             }
 
-            else if (isCommand(command, args, "del")){
+            else if (isCommand(command, args, "rm")){
                 if (command == "help"){
-                    getHelp(DEL);
+                    getHelp(RM);
                 }
                 else{
+                    AssetManager::delFile(args.at(0));
+                }
+            }
 
+            else if (isCommand(command, args, "ls")){
+                if (command == "help"){
+                    getHelp(LS);
+                }
+                else{
+                    AssetManager::listFiles();
                 }
             }
 

@@ -3,18 +3,21 @@
 //INCLUDE STATEMENTS:
 #include <iostream>
 #include <string>
-#include <map>
+#include <unordered_map>
+#include <set>
 #include <filesystem>
 #include <SFML/Graphics.hpp>
 
 //USING STATEMENTS:
 using std::string;
-using std::map;
+using std::unordered_map;
+using std::set;
 using std::pair;
 using std::out_of_range;
 using std::cout;
 using std::endl;
 using std::cerr;
+using std::string_view;
 
 namespace fs = std::filesystem;
 
@@ -22,17 +25,19 @@ using sf::Texture;
 using sf::Font;
 
 //CONSTANTS:
-static const string MISSING_TEXTURE = "_missingtexture.png";
-static const string DEFAULT_FONT = "OpenSans-Regular400.ttf";
+static const string_view MISSING_TEXTURE = "_missingtexture.png";
+static const string_view DEFAULT_FONT = "OpenSans-Regular400.ttf";
 
 ///Handles asset loading and assignment for the entire application.
 class AssetManager {
 
-    static map<string,Texture> textures; ///< Texture map for easy access using the name of the texture.
+    static unordered_map<string,Texture> textures; ///< Texture map for easy access using the name of the texture.
     static string textureFolder; ///< Location of the texture folder.
 
-    static map<string, Font> fonts; ///< Font map for easy access using the name of the font.
+    static unordered_map<string, Font> fonts; ///< Font map for easy access using the name of the font.
     static string fontFolder; ///< Location of the font folder.
+
+    static set<string> files; ///< Set of file locations for image processing.
 
 public:
     /// Default Constructor.
@@ -69,6 +74,16 @@ public:
     /// @param fontName the filename of the target texture.
     /// @returns a reference to the font in the map if it exists. Otherwise, it returns the default font.
     static const Font& getFont(const string& fontName);
+
+    /* * * * * * * * * * *
+     * FILE    FUNCTIONS *
+     * * * * * * * * * * */
+
+    static bool addFile(const string& fileLocation);
+
+    static bool delFile(const string& fileLocation);
+
+    static void listFiles();
 
     /* * * * * * * * * * * *
      * SERIALIZE FUNCTIONS *

@@ -11,9 +11,10 @@ using std::string;
 
 enum Names{
         ADD,
-        DEL,
-        HELP,
+        RM,
+        LS,
         PYTHON,
+        HELP,
         ALL //Used to iterate through the enum to list all commands.
 };
     void getHelp(int command);

@@ -1,8 +1,9 @@
 #include "AssetManager.h"
 
 //Defining static class member variables.
-map<string,Texture> AssetManager::textures;
-map<string,Font> AssetManager::fonts;
+unordered_map<string,Texture> AssetManager::textures;
+unordered_map<string,Font> AssetManager::fonts;
+set<string> AssetManager::files;
 string AssetManager::textureFolder;
 string AssetManager::fontFolder;
 
@@ -12,16 +13,16 @@ AssetManager::AssetManager(const string& prefix){
     fontFolder = prefix + "res/fonts/";
 
     //2. Attempt to load the missing texture.
-    if (!addTexture(MISSING_TEXTURE)){
+    if (!addTexture(MISSING_TEXTURE.data())){
         throw std::invalid_argument("[Asset Manager] FATAL! Missing texture was not found! Stopping program...");
     }
 
-    if (!addFont(DEFAULT_FONT)){
+    if (!addFont(DEFAULT_FONT.data())){
         throw std::invalid_argument("[Asset Manager] FATAL! Default font was not found! Stopping program...");
     }
 
     //3. Make the missing texture a repeating texture.
-    AssetManager::textures.at(MISSING_TEXTURE).setRepeated(true);
+    AssetManager::textures.at(MISSING_TEXTURE.data()).setRepeated(true);
 }
 
 bool AssetManager::addTexture(const string& textureName) {
@@ -54,7 +55,7 @@ const Texture& AssetManager::getTexture(const string& textureName){
 
     //2. If the texture was not found, return the missing texture.
     try{
-        return(textures.at(MISSING_TEXTURE));
+        return(textures.at(MISSING_TEXTURE.data()));
     }
 
     catch (std::out_of_range& out_of_range2){
@@ -93,11 +94,48 @@ const Font &AssetManager::getFont(const string &fontName){
 
     //2. If the texture was not found, return the missing texture.
     try{
-        return(fonts.at(DEFAULT_FONT));
+        return(fonts.at(DEFAULT_FONT.data()));
     }
 
     catch (std::out_of_range& out_of_range2){
         throw std::invalid_argument("[Asset Manager] FATAL! Default font was not found! Stopping program...");
+    }
+}
+
+bool AssetManager::addFile(const string &fileLocation){
+    //1. Check if the file exists.
+    if (!fs::exists(fileLocation)){
+        cerr << "File at " << fileLocation << " does not exist!" << endl;
+        return false;
+    }
+
+    //TODO: Check if the file has one of the allowed extensions.
+
+    //2. Add the file location to the set.
+    files.insert(fileLocation);
+
+    return true;
+}
+
+bool AssetManager::delFile(const string &fileLocation){
+    //1. Check if the file exists in the file set.
+    if (files.count(fileLocation) == 0){
+        cerr << "File " << fileLocation << " was not in the file list!" << endl;
+        return false;
+    }
+
+    //2. Remove the file from the file set.
+    files.erase(fileLocation);
+
+    return true;
+}
+
+void AssetManager::listFiles(){
+    //1. List the files in the file set.
+
+    cout << "Found " << files.size() << " files in the file list:" << endl;
+    for (const string& file : files){
+        cout << "- " << file << endl;
     }
 }
 
@@ -106,7 +144,6 @@ void AssetManager::loadAll(){
 
     //1. Construct a directory iterator with the file path for textures
     fs::directory_iterator textureIter((fs::path(textureFolder)));
-
     //2. For each file in the directory, add the texture to the asset manager.
     for (const auto &file : textureIter){
         cout << "\t- " << file.path();

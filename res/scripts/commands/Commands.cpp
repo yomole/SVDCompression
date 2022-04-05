@@ -10,10 +10,18 @@ void getHelp(int command){
             break;
         }
 
-        case DEL:{
-            cout    << "del \"[File Location]\""
+        case RM:{
+            cout    << "rm \"[File Location]\""
                     << endl
                     << "\tRemoves a file from the program file list. Any file not on the file list will not be processed."
+                    << endl;
+            break;
+        }
+
+        case LS:{
+            cout    << "ls"
+                    << endl
+                    << "\tLists all of the files on the file list."
                     << endl;
             break;
         }
