@@ -9,6 +9,7 @@ void getHelp(int command){
                     << endl;
             break;
         }
+
         case DEL:{
             cout    << "del \"[File Location]\""
                     << endl
@@ -16,6 +17,15 @@ void getHelp(int command){
                     << endl;
             break;
         }
+
+        case PYTHON:{
+            cout    << "python \"[Script Location]\""
+                    << endl
+                    << "\tRuns a python script from the command line. NOTE: remove upon release!"
+                    << endl;
+            break;
+        }
+
         case HELP:{
             cout    << "help [command]"
                     << endl
@@ -23,6 +33,7 @@ void getHelp(int command){
                     << endl;
             break;
         }
+
     }
 }
 

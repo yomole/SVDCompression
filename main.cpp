@@ -3,12 +3,14 @@
 #include <SFML/Graphics.hpp>
 #include <sstream>
 #include <vector>
+#include <fstream>
 #include "res/scripts/managers/AssetManager.h"
 #include "res/scripts/managers/UIElementManager.h"
 #include "res/scripts/ui/Button.h"
 #include "res/scripts/ui/super/TextBased.h"
 #include "res/scripts/ui/ProgressBar.h"
 #include "res/scripts/commands/Commands.h"
+#include "res/scripts/python/PythonScript.h"
 
 using sf::Event;
 using sf::Mouse;
@@ -117,11 +119,26 @@ int main(int argc, char* argv[]) {
                 if (command == "help"){
                     getHelp(ADD);
                 }
+                else{
+
+                }
             }
 
             else if (isCommand(command, args, "del")){
                 if (command == "help"){
                     getHelp(DEL);
+                }
+                else{
+
+                }
+            }
+
+            else if (isCommand(command, args, "python")){
+                if (command == "help"){
+                    getHelp(PYTHON);
+                }
+                else{
+                    runPy(args.at(0));
                 }
             }
 
