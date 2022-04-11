@@ -1,0 +1,5 @@
+add ../res/textures/test.png
+add ../res/textures/testPressed.png
+ls
+python "../res/python testing/test2.py"
+exit

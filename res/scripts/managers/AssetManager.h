@@ -83,6 +83,8 @@ public:
 
     static bool delFile(const string& fileLocation);
 
+    static set<string>& getFiles();
+
     static void listFiles();
 
     /* * * * * * * * * * * *

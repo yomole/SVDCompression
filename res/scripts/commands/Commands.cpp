@@ -2,6 +2,14 @@
 
 void getHelp(int command){
     switch(command){
+        case ABOUT:{
+            cout    << "about"
+                    << endl
+                    << "\tDisplays information about the program along with a list of references."
+                    << endl;
+            break;
+        }
+
         case ADD:{
             cout    << "add \"[File Location]\""
                     << endl
@@ -41,7 +49,6 @@ void getHelp(int command){
                     << endl;
             break;
         }
-
     }
 }
 

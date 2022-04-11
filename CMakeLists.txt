@@ -9,6 +9,10 @@ include_directories(lib/SFML-2.5.1/include)
 find_package(Python COMPONENTS Interpreter Development)
 include_directories(lib/Python/include)
 set(python_LIBRARIES lib/Python/DLLs)
+include_directories(lib/numpy/core/include)
+set(pybind11_DIR lib/pybind11/share/cmake/pybind11)
+find_package(pybind11 REQUIRED)
+include_directories(lib/pybind11/include)
 
 set(sources
         main.cpp
@@ -25,7 +29,11 @@ set(sources
         res/scripts/ui/super/TextBased.cpp
         res/scripts/ui/super/TextBased.h
         res/scripts/ui/ProgressBar.cpp
-        res/scripts/ui/ProgressBar.h res/scripts/commands/Commands.cpp res/scripts/commands/Commands.h res/scripts/python/PythonScript.cpp res/scripts/python/PythonScript.h)
+        res/scripts/ui/ProgressBar.h
+        res/scripts/commands/Commands.cpp
+        res/scripts/commands/Commands.h
+        res/scripts/python/PythonScript.cpp
+        res/scripts/python/PythonScript.h)
 
 add_executable(SVDCompression ${sources})
 target_link_libraries(SVDCompression sfml-system sfml-window sfml-graphics sfml-network sfml-audio ${Python_LIBRARIES})

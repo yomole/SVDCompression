@@ -10,6 +10,7 @@ using std::map;
 using std::string;
 
 enum Names{
+        ABOUT,
         ADD,
         RM,
         LS,

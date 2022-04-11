@@ -21,14 +21,17 @@ using std::rand;
 using std::getline;
 using std::istringstream;
 using std::vector;
+using std::ifstream;
 
 //FUNCTION PROTOTYPES:
 bool isCommand(const string& command, const vector<string>& args, const string& target);
+void parseArgs(istringstream& parse, vector<string>& args);
+void printAbout();
 
 int main(int argc, char* argv[]) {
 
     //Testing...
-    if (argc != 0 && string(argv[1]) == "-test") {
+    if (argc > 1 && string(argv[1]) == "-test") {
 
         sf::RenderWindow window(sf::VideoMode(1200, 600), "Media Compression by iCompression ~ TESTING MODE");
         window.setFramerateLimit(60); //Set the fps limit to 60 fps.
@@ -97,23 +100,35 @@ int main(int argc, char* argv[]) {
     }
 
     //CLI Mode (Prioritize first for basic testing).
-    else if (argc != 0 && string(argv[1]) == "-cli"){
+    else if (argc > 1 && string(argv[1]) == "-cli"){
         cout << "Media Compression by iCompression: CLI Mode" << endl;
+        ifstream file;
+
+        if (argc > 2 && string(argv[2]) == "-file"){
+            file.open(argv[3]);
+        }
+
         string line, command;
         do{
             command = "";
-            //1. Get the entire line of command.
-            getline(cin, line);
+            if (argc <= 2) {
+                //1. Get the entire line of command.
+                getline(cin, line);
+            }
+            else{
+                if (file.is_open()){
+                    getline(file, line);
+                }
+                else{
+                    cerr << "file at " << argv[3] << " does not exist!";
+                }
+            }
 
             //2. Parse it into command parts.
             istringstream parse(line);
             vector<string> args;
             parse >> command;
-            while(!parse.eof()){
-                string i;
-                parse >> i;
-                args.push_back(i);
-            }
+            parseArgs(parse, args);
 
             //3. Run the appropriate command.
             if (isCommand(command, args, "add")){
@@ -148,7 +163,16 @@ int main(int argc, char* argv[]) {
                     getHelp(PYTHON);
                 }
                 else{
-                    runPy(args.at(0));
+                    runPy(args.at(0), AssetManager::getFiles());
+                }
+            }
+
+            else if (isCommand(command, args, "about")){
+                if (command == "help"){
+                    getHelp(ABOUT);
+                }
+                else{
+                    printAbout();
                 }
             }
 
@@ -176,4 +200,42 @@ int main(int argc, char* argv[]) {
 
 bool isCommand(const string& command, const vector<string>& args, const string& target){
     return ((command == target) || (!args.empty() && args.at(0) == target));
+}
+
+void parseArgs(istringstream& parse, vector<string>& args){
+    while(!parse.eof()){
+        //Load the first part of the string.
+        string i, temp;
+        parse >> i;
+
+        //If the first character is a quotation mark, keep loading until last character is a quotation mark.
+        if (i.front() == '\"'){
+            //Remove beginning quotation mark.
+            i.erase(0, 1);
+
+            while(i.back() != '\"' && !parse.eof()){
+                parse >> temp;
+                i += (" " + temp);
+            }
+
+            //Remove ending quotation mark.
+            i.erase(i.end() - 1);
+        }
+
+        args.push_back(i);
+    }
+}
+
+void printAbout(){
+    ifstream file("../README.md");
+
+    if (file.is_open()){
+        string line;
+        while(getline(file, line)){
+            cout << line << endl;
+        }
+    }
+    else{
+        cerr << "Unable to display information about the program. For information, please go to the github repository.";
+    }
 }

@@ -130,6 +130,10 @@ bool AssetManager::delFile(const string &fileLocation){
     return true;
 }
 
+set<string>& AssetManager::getFiles(){
+    return files;
+}
+
 void AssetManager::listFiles(){
     //1. List the files in the file set.
 
