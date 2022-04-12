@@ -14,26 +14,28 @@ set(pybind11_DIR lib/pybind11/share/cmake/pybind11)
 find_package(pybind11 REQUIRED)
 include_directories(lib/pybind11/include)
 
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -g")
+
 set(sources
         main.cpp
-        res/scripts/ui/Button.cpp
-        res/scripts/ui/Button.h
-        res/scripts/ui/super/UIElement.cpp
-        res/scripts/ui/super/UIElement.h
-        res/scripts/managers/AssetManager.cpp
-        res/scripts/managers/AssetManager.h
-        res/scripts/managers/UIElementManager.cpp
-        res/scripts/managers/UIElementManager.h
-        res/scripts/ui/super/SpriteBased.cpp
-        res/scripts/ui/super/SpriteBased.h
-        res/scripts/ui/super/TextBased.cpp
-        res/scripts/ui/super/TextBased.h
-        res/scripts/ui/ProgressBar.cpp
-        res/scripts/ui/ProgressBar.h
-        res/scripts/commands/Commands.cpp
-        res/scripts/commands/Commands.h
-        res/scripts/python/PythonScript.cpp
-        res/scripts/python/PythonScript.h)
+        res/src/ui/Button.cpp
+        res/src/ui/Button.h
+        res/src/ui/super/UIElement.cpp
+        res/src/ui/super/UIElement.h
+        res/src/managers/AssetManager.cpp
+        res/src/managers/AssetManager.h
+        res/src/managers/ViewManager.cpp
+        res/src/managers/ViewManager.h
+        res/src/ui/super/SpriteBased.cpp
+        res/src/ui/super/SpriteBased.h
+        res/src/ui/ProgressBar.cpp
+        res/src/ui/ProgressBar.h
+        res/src/commands/Commands.cpp
+        res/src/commands/Commands.h
+        res/src/python/PythonScript.cpp
+        res/src/python/PythonScript.h
+        res/src/ui/view/View.cpp
+        res/src/ui/view/View.h)
 
 add_executable(SVDCompression ${sources})
 target_link_libraries(SVDCompression sfml-system sfml-window sfml-graphics sfml-network sfml-audio ${Python_LIBRARIES})

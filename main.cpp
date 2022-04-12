@@ -4,13 +4,10 @@
 #include <sstream>
 #include <vector>
 #include <fstream>
-#include "res/scripts/managers/AssetManager.h"
-#include "res/scripts/managers/UIElementManager.h"
-#include "res/scripts/ui/Button.h"
-#include "res/scripts/ui/super/TextBased.h"
-#include "res/scripts/ui/ProgressBar.h"
-#include "res/scripts/commands/Commands.h"
-#include "res/scripts/python/PythonScript.h"
+#include "res/src/managers/AssetManager.h"
+#include "res/src/managers/ViewManager.h"
+#include "res/src/commands/Commands.h"
+#include "res/src/python/PythonScript.h"
 
 using sf::Event;
 using sf::Mouse;
@@ -33,41 +30,28 @@ int main(int argc, char* argv[]) {
     //Testing...
     if (argc > 1 && string(argv[1]) == "-test") {
 
-        sf::RenderWindow window(sf::VideoMode(1200, 600), "Media Compression by iCompression ~ TESTING MODE");
+        sf::RenderWindow window(sf::VideoMode(1200, 800), "Media Compression by iCompression ~ TESTING MODE");
         window.setFramerateLimit(60); //Set the fps limit to 60 fps.
         AssetManager textureManager("../"); //Make a texture manager with the right prefix for CLion.
-        UIElementManager uiElementManager(&window);
-
         AssetManager::loadAll();
 
-        //TODO: Make progress bar entities part of the asset manager to avoid memory leaks!
-        auto *progress = new ProgressBar("Progress Bar Test", Vector2f(200, 20), Vector2f(300, 200));
+        ViewManager viewManager(&window);
+        ViewManager::addView("test", "../res/views/test.txt");
+        ViewManager::addView("test2", "../res/views/test2.txt");
 
-        Button button("Dr. Disco", AssetManager::getTexture("test.png"), Vector2f(0, 0),
-                      [&button, &progress]() -> void {
-                          button.getSprite().setColor(sf::Color(rand() % 256, rand() % 256, rand() % 256));
-                          cout << "Progress bar ( " << &(*progress) << ") percentage went from "
-                               << progress->getPercentage();
-                          progress->setPercentage(progress->getPercentage() + .05);
-                          cout << " to " << progress->getPercentage() << endl;
-                      });
+        ViewManager::getView("test").addButton("testButton", Vector2f(300, 50), "test.png", []()->void{
+            ViewManager::changeView("test2");
+            unique_ptr<ProgressBar>& david = ViewManager::getView("test").getProgressBar("david");
+            david->setPercentage(david->getPercentage() + .05);
+        });
 
-        Button button2("Press button test", AssetManager::getTexture("test.png"), Vector2f(256, 256),
-                       [&button2]() -> void {
-                           button2.getSprite().setTexture(AssetManager::getTexture("testPressed.png"));
-                       });
+        ViewManager::getView("test2").addButton("testButton2", Vector2f(300, 50), "test.png", []()->void{
+            ViewManager::changeView("test");
+        });
 
-        Button button3("Missing texture test", AssetManager::getTexture("test2.png"), Vector2f(128, 0),
-                       [&button3]() -> void {
-                           button3.getSprite().setTexture(AssetManager::getTexture("tested.png"));
-                       });
+        ViewManager::getView("test2").getImage("image")->loadFromFile("../input/taipei 101.jpg");
 
-        TextBased testText("testing text", Vector2f(40, 150), AssetManager::getFont(DEFAULT_FONT.data()), "Hello World!");
-
-        UIElementManager::addElement(&button);
-        UIElementManager::addElement(&button2);
-        UIElementManager::addElement(&button3);
-        UIElementManager::addElement(&testText);
+        ViewManager::changeView("test");
 
         while (window.isOpen()) {
             sf::Event event{};
@@ -80,20 +64,16 @@ int main(int argc, char* argv[]) {
 
                     case (Event::MouseButtonPressed): {
                         if (event.mouseButton.button == Mouse::Left) {
-                            UIElementManager::activateElement(Mouse::getPosition(window));
+                            ViewManager::activateElement(Mouse::getPosition(window));
                         }
                         break;
                     }
                 }
             }
-
+            ViewManager::getView("test").getText("mxv")->setString(std::to_string(Mouse::getPosition(window).x));
+            ViewManager::getView("test").getText("myv")->setString(std::to_string(Mouse::getPosition(window).y));
             window.clear(sf::Color::White);
-            UIElementManager::drawAll();
-
-            for (RectangleShape *i: progress->getShapes()) {
-                window.draw(*i);
-            }
-
+            ViewManager::drawAll();
             window.display();
         }
         return 0;
@@ -121,6 +101,7 @@ int main(int argc, char* argv[]) {
                 }
                 else{
                     cerr << "file at " << argv[3] << " does not exist!";
+                    exit(1);
                 }
             }
 
