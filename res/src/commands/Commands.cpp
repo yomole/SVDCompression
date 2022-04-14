@@ -13,7 +13,28 @@ void getHelp(int command){
         case ADD:{
             cout    << "add \"[File Location]\""
                     << endl
-                    << "\tAdds a file to the program file list. Any file on the file list will be processed."
+                    << "\tAdds an image file to the program file list. Any file on the file list will be processed."
+                    << endl
+                    << "\tValid file extensions include: .jpg, .png, .bmp, and .tga"
+                    << endl;
+            break;
+        }
+
+        case ADDF:{
+            cout    << "addf \"[Folder Location]\""
+                    << endl
+                    << "\tAdds all valid image files in a folder to the program file list."
+                    << endl
+                    << "\tValid file extensions include: .jpg, .png, .bmp, and .tga"
+                    << endl;
+            break;
+        }
+
+        case COMPRESS:{
+            cout    << "compress [Size][K/M]"
+                    << endl
+                    << "\tRuns the compression algorithms on the files in the program file list until we are at or a "
+                       "bit below the target file size."
                     << endl;
             break;
         }
@@ -21,7 +42,16 @@ void getHelp(int command){
         case RM:{
             cout    << "rm \"[File Location]\""
                     << endl
-                    << "\tRemoves a file from the program file list. Any file not on the file list will not be processed."
+                    << "\tRemoves an image file from the program file list. Any file not on the file list will not be "
+                       "processed."
+                    << endl;
+            break;
+        }
+
+        case RMF:{
+            cout    << "rmf \"[Folder Location]\""
+                    << endl
+                    << "\tRemoves all valid image files in a folder from the program file list."
                     << endl;
             break;
         }

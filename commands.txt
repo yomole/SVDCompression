@@ -1,5 +1,3 @@
-add ../res/textures/test.png
-add ../res/textures/testPressed.png
+addf "../input"
 ls
-python "../res/python testing/test2.py"
-exit
+python "../res/python/test2.py"

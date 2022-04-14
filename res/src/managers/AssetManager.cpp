@@ -117,7 +117,33 @@ bool AssetManager::addFile(const string &fileLocation){
     return true;
 }
 
-bool AssetManager::delFile(const string &fileLocation){
+bool AssetManager::addFolder(const string &folderLocation){
+    //1. Check if the folder exists.
+    if (!fs::exists(folderLocation)){
+        cerr << "The folder " << folderLocation << " does not exist!" << endl;
+        return false;
+    }
+
+    //2. Make an iterator for the directory.
+    auto iter = fs::directory_iterator(folderLocation);
+
+    //3. For every file, ensure it is of a valid file type, and then add it to the set of file locations.
+    unsigned int numAdded = 0;
+    for (const auto& file : iter){
+        //Convert file path to string, verify, then add.
+        string filePath = file.path().string();
+        if (validFile(filePath)){
+            files.insert(filePath);
+            numAdded++;
+        }
+    }
+
+    cout << "Added " << numAdded << " files." << endl;
+
+    return true;
+}
+
+bool AssetManager::delFile(const string& fileLocation){
     //1. Check if the file exists in the file set.
     if (files.count(fileLocation) == 0){
         cerr << "File " << fileLocation << " was not in the file list!" << endl;
@@ -128,6 +154,44 @@ bool AssetManager::delFile(const string &fileLocation){
     files.erase(fileLocation);
 
     return true;
+}
+
+bool AssetManager::delFolder(const string& folderLocation){
+    //1. Check if the folder exists.
+    if (!fs::exists(folderLocation)){
+        cerr << "The folder " << folderLocation << " does not exist!" << endl;
+        return false;
+    }
+
+    //2. Make an iterator for the directory.
+    auto iter = fs::directory_iterator(folderLocation);
+
+    //3. For every file, try to erase it from the set if possible.
+    unsigned int numRemoved = 0;
+    for (const auto& file : iter){
+        if(files.erase(file.path().string()) == 1){
+            numRemoved++;
+        }
+    }
+
+    cout << "Removed " << numRemoved << " files." << endl;
+
+    return true;
+}
+
+bool AssetManager::validFile(const string& filePath){
+    //1. Take the filepath and isolate the extension.
+    unsigned int dot = filePath.find_last_of('.');
+    string extension = filePath.substr(dot, filePath.length() - dot);
+
+    //2. Check the extension against those supported by the program and SFML.
+    for (const string& i : FILE_EXTENSIONS){
+        if (extension == i){
+            return true;
+        }
+    }
+
+    return false;
 }
 
 set<string>& AssetManager::getFiles(){

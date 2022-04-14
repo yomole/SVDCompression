@@ -12,7 +12,10 @@ using std::string;
 enum Names{
         ABOUT,
         ADD,
+        ADDF,
+        COMPRESS,
         RM,
+        RMF,
         LS,
         PYTHON,
         HELP,

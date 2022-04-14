@@ -2,8 +2,9 @@ cmake_minimum_required(VERSION 3.0)
 project(SVDCompression)
 
 set(CMAKE_CXX_STANDARD 17)
-set(SFML_DIR lib/SFML-2.5.1/lib/cmake/SFML)
+set(CMAKE_EXE_LINKER_FLAGS "-static")
 
+set(SFML_DIR lib/SFML-2.5.1/lib/cmake/SFML)
 find_package(SFML REQUIRED system window graphics network audio)
 include_directories(lib/SFML-2.5.1/include)
 find_package(Python COMPONENTS Interpreter Development)
@@ -15,9 +16,11 @@ find_package(pybind11 REQUIRED)
 include_directories(lib/pybind11/include)
 
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -g")
+set(dir ${CMAKE_CURRENT_SOURCE_DIR})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${dir}/bin")
 
 set(sources
-        main.cpp
+        res/src/main.cpp
         res/src/ui/Button.cpp
         res/src/ui/Button.h
         res/src/ui/super/UIElement.cpp
@@ -38,4 +41,6 @@ set(sources
         res/src/ui/view/View.h)
 
 add_executable(SVDCompression ${sources})
+
+#MAKE SURE TO INCLUDE -mwindows and -lsfml-main TO REMOVE THE CONSOLE WINDOW WHEN IN GUI.
 target_link_libraries(SVDCompression sfml-system sfml-window sfml-graphics sfml-network sfml-audio ${Python_LIBRARIES})

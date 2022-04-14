@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <unordered_map>
+#include <vector>
 #include <set>
 #include <filesystem>
 #include <SFML/Graphics.hpp>
@@ -27,6 +28,9 @@ using sf::Font;
 //CONSTANTS:
 static const string_view MISSING_TEXTURE = "_missingtexture.png";
 static const string_view DEFAULT_FONT = "OpenSans-Regular400.ttf";
+
+static const unsigned int NUM_EXTENSIONS = 4;
+static const string FILE_EXTENSIONS[NUM_EXTENSIONS] = {".jpg", ".png", ".bmp", ".tga"};
 
 ///Handles asset loading and assignment for the entire application.
 class AssetManager {
@@ -81,7 +85,13 @@ public:
 
     static bool addFile(const string& fileLocation);
 
+    static bool addFolder(const string& folderLocation);
+
     static bool delFile(const string& fileLocation);
+
+    static bool delFolder(const string& folderLocation);
+
+    static bool validFile(const string& filePath);
 
     static set<string>& getFiles();
 
