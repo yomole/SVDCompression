@@ -181,7 +181,12 @@ bool AssetManager::delFolder(const string& folderLocation){
 
 bool AssetManager::validFile(const string& filePath){
     //1. Take the filepath and isolate the extension.
-    unsigned int dot = filePath.find_last_of('.');
+    int dot = filePath.find_last_of('.');
+
+    if (dot == string::npos){
+        return false;
+    }
+
     string extension = filePath.substr(dot, filePath.length() - dot);
 
     //2. Check the extension against those supported by the program and SFML.

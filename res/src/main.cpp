@@ -27,18 +27,21 @@ void printAbout();
 
 int main(int argc, char* argv[]) {
 
+    //Load the python interpreter to keep it alive for as long as possible.
+    scope = new py::scoped_interpreter{};
+
     //Testing...
     if (argc > 1 && string(argv[1]) == "-test") {
 
         sf::RenderWindow window(sf::VideoMode(1200, 800), "Media Compression by iCompression ~ TESTING MODE");
         window.setFramerateLimit(60); //Set the fps limit to 60 fps.
         //TODO: Make prefix work in final build.
-        AssetManager("../"); //Set the prefix for the asset manager (CLion's default).
+        AssetManager(""); //Set the prefix for the asset manager (CLion's default).
         AssetManager::loadAll();
 
         ViewManager viewManager(&window);
-        ViewManager::addView("test", "../res/views/test.txt");
-        ViewManager::addView("test2", "../res/views/test2.txt");
+        ViewManager::addView("test", "res/views/test.txt");
+        ViewManager::addView("test2", "res/views/test2.txt");
 
         ViewManager::getView("test").addButton("testButton", Vector2f(300, 50), "test.png", []()->void{
             ViewManager::changeView("test2");
@@ -50,7 +53,7 @@ int main(int argc, char* argv[]) {
             ViewManager::changeView("test");
         });
 
-        ViewManager::getView("test2").getImage("image")->loadFromFile("../input/taipei 101.jpg");
+        ViewManager::getView("test2").getImage("image")->loadFromFile("input/taipei 101.jpg");
 
         ViewManager::changeView("test");
 
@@ -81,7 +84,7 @@ int main(int argc, char* argv[]) {
     }
 
     //CLI Mode (Prioritize first for basic testing).
-    else if (argc > 1 && string(argv[1]) == "-cli"){
+    else if (argc > 1 || string(argv[1]) == "-cli"){
         cout << "Media Compression by iCompression: CLI Mode" << endl;
         ifstream file;
 
@@ -93,7 +96,7 @@ int main(int argc, char* argv[]) {
         do{
             command = "";
             if (argc <= 2) {
-                cout << "> ";
+                cout << "SVDCompression> ";
                 //1. Get the entire line of command.
                 getline(cin, line);
             }
@@ -159,20 +162,12 @@ int main(int argc, char* argv[]) {
                 }
             }
 
-            else if (isCommand(command, args, "python")){
-                if (command == "help"){
-                    getHelp(PYTHON);
-                }
-                else if (args.size() == 1){
-                    runPy(args.at(0), AssetManager::getFiles());
-                }
-            }
-
             else if (isCommand(command, args, "compress")){
                 if (command == "help"){
                     getHelp(COMPRESS);
                 }
                 else if (args.size() == 1){
+                    SVDAlgorithm(args.at(0), AssetManager::getFiles());
                 }
             }
 
@@ -205,6 +200,10 @@ int main(int argc, char* argv[]) {
     else{
 
     }
+
+    //Close the python interpreter.
+    delete scope;
+
 }
 
 bool isCommand(const string& command, const vector<string>& args, const string& target){
@@ -236,7 +235,7 @@ void parseArgs(istringstream& parse, vector<string>& args){
 }
 
 void printAbout(){
-    ifstream file("../README.md");
+    ifstream file("README.md");
 
     if (file.is_open()){
         string line;

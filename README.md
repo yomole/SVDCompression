@@ -6,10 +6,11 @@ On some internet platforms and messaging services, there are limits to the size 
 
 ## References
 
-### In Implementing Pybind11
+### In Implementing Pybind11 with numpy
 - https://stackoverflow.com/questions/3654652/why-does-the-python-c-api-crash-on-pyrun-simplefile
 - https://pybind11.readthedocs.io/en/stable/advanced/pycpp/utilities.html#eval
 - https://github.com/pybind/pybind11/issues/1543
 - https://pybind11.readthedocs.io/en/stable/advanced/cast/stl.html
 - https://pybind11.readthedocs.io/en/stable/advanced/cast/overview.html
 - https://github.com/aoloe/cpp-pybind11-playground/tree/master/eval-file
+- https://github.com/numpy/numpy/issues/8097
