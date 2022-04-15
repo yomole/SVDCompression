@@ -60,10 +60,14 @@ public:
     /// @returns true if the texture was successfully added.
     static bool addTexture(const string& textureName);
 
+    static bool addImage(const string& fileLocation);
+
     /// @brief Accessor for the texture map.
     /// @param textureName the filename of the target texture.
     /// @returns a reference to the texture in the map if it exists. Otherwise, it returns the missing texture.
     static const Texture& getTexture(const string& textureName);
+
+    static bool textureExists(const string& textureName);
 
     /* * * * * * * * * *
      * FONT  FUNCTIONS *
