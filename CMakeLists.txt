@@ -27,8 +27,8 @@ set(sources
         res/src/ui/super/UIElement.h
         res/src/managers/AssetManager.cpp
         res/src/managers/AssetManager.h
-        res/src/managers/ViewManager.cpp
-        res/src/managers/ViewManager.h
+        res/src/managers/SceneManager.cpp
+        res/src/managers/SceneManager.h
         res/src/ui/super/SpriteBased.cpp
         res/src/ui/super/SpriteBased.h
         res/src/ui/ProgressBar.cpp
@@ -37,8 +37,10 @@ set(sources
         res/src/commands/Commands.h
         res/src/python/PythonScript.cpp
         res/src/python/PythonScript.h
-        res/src/ui/view/View.cpp
-        res/src/ui/view/View.h)
+        res/src/ui/view/Scene.cpp
+        res/src/ui/view/Scene.h
+        res/src/ui/functions/ButtonFunctions.h
+        res/src/ui/functions/ButtonFunctions.cpp)
 
 add_executable(SVDCompression ${sources})
 

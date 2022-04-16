@@ -1,0 +1,5 @@
+text test 0 50 default 20 Hello, I am also text!
+image beach.jpg ../input/beach.jpg 575 100 .10 .10
+button goBack test.png 0 100 ChangeScene test
+text info 0 165 default 20 Click below to cycle through the images in the input folder.
+button change test.png 0 200 CycleImages test2 beach.jpg 2 _files_

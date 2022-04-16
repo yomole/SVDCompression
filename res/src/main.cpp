@@ -5,7 +5,7 @@
 #include <vector>
 #include <fstream>
 #include "managers/AssetManager.h"
-#include "managers/ViewManager.h"
+#include "managers/SceneManager.h"
 #include "commands/Commands.h"
 #include "python/PythonScript.h"
 
@@ -36,26 +36,16 @@ int main(int argc, char* argv[]) {
         sf::RenderWindow window(sf::VideoMode(1200, 800), "Media Compression by iCompression ~ TESTING MODE");
         window.setFramerateLimit(60); //Set the fps limit to 60 fps.
         //TODO: Make prefix work in final build.
-        AssetManager(""); //Set the prefix for the asset manager (CLion's default).
+        AssetManager("../"); //Set the prefix for the asset manager (CLion's default).
         AssetManager::loadAll();
 
-        ViewManager viewManager(&window);
-        ViewManager::addView("test", "res/views/test.txt");
-        ViewManager::addView("test2", "res/views/test2.txt");
+        AssetManager::addFolder("../input");
 
-        ViewManager::getView("test").addButton("testButton", Vector2f(300, 50), "test.png", []()->void{
-            ViewManager::changeView("test2");
-            unique_ptr<ProgressBar>& david = ViewManager::getView("test").getProgressBar("david");
-            david->setPercentage(david->getPercentage() + .05);
-        });
+        SceneManager viewManager(&window);
+        SceneManager::addView("test", "../res/scenes/test.txt");
+        SceneManager::addView("test2", "../res/scenes/test2.txt");
 
-        ViewManager::getView("test2").addButton("testButton2", Vector2f(300, 50), "test.png", []()->void{
-            ViewManager::changeView("test");
-        });
-
-        ViewManager::getView("test2").getImage("image")->loadFromFile("input/taipei 101.jpg");
-
-        ViewManager::changeView("test");
+        SceneManager::changeView("test");
 
         while (window.isOpen()) {
             sf::Event event{};
@@ -68,16 +58,16 @@ int main(int argc, char* argv[]) {
 
                     case (Event::MouseButtonPressed): {
                         if (event.mouseButton.button == Mouse::Left) {
-                            ViewManager::activateElement(Mouse::getPosition(window));
+                            SceneManager::activateElement(Mouse::getPosition(window));
                         }
                         break;
                     }
                 }
             }
-            ViewManager::getView("test").getText("mxv")->setString(std::to_string(Mouse::getPosition(window).x));
-            ViewManager::getView("test").getText("myv")->setString(std::to_string(Mouse::getPosition(window).y));
+            SceneManager::getView("test").getText("mxv")->setString(std::to_string(Mouse::getPosition(window).x));
+            SceneManager::getView("test").getText("myv")->setString(std::to_string(Mouse::getPosition(window).y));
             window.clear(sf::Color::White);
-            ViewManager::drawAll();
+            SceneManager::drawAll();
             window.display();
         }
         return 0;

@@ -43,6 +43,42 @@ bool AssetManager::addTexture(const string& textureName) {
     return true;
 }
 
+bool AssetManager::addImage(const string &fileLocation){
+    //1. Create a directory entry from the file location.
+    fs::directory_entry iter(fileLocation.data());
+
+    //2. Pull the texture name from the file name.
+    string textureName = iter.path().filename().string();
+
+    //2. Check if the file exists.
+    if (!iter.exists()){
+        cerr << "The image " << fileLocation << " does not exist!" << endl;
+        return false;
+    }
+
+    //3. Check if it is a valid file type.
+    if (!validFile(fileLocation)){
+        cerr << "The image " << fileLocation << "is not a valid image type!" << endl;
+        return false;
+    }
+
+    //1. Look through the textures to see if the name of the texture already exists.
+    if (textures.find(textureName) != textures.end()){
+        return false;
+    }
+
+    //2. Create a new texture and load it from the specified file.
+    Texture newText;
+    if (!newText.loadFromFile(iter.path().string())){
+        return false;
+    }
+
+    //3. Put it into the map.
+    textures.insert(pair<string, Texture>(textureName, newText));
+
+    return true;
+}
+
 const Texture& AssetManager::getTexture(const string& textureName){
     //1. Try to access the texture with the given file name.
     try{
@@ -62,6 +98,10 @@ const Texture& AssetManager::getTexture(const string& textureName){
         throw std::invalid_argument("[Asset Manager] FATAL! Missing texture was not found! Stopping program...");
     }
 
+}
+
+bool AssetManager::textureExists(const string &textureName){
+    return textures.count(textureName) == 1;
 }
 
 bool AssetManager::addFont(const string &fontName){
@@ -109,10 +149,15 @@ bool AssetManager::addFile(const string &fileLocation){
         return false;
     }
 
-    //TODO: Check if the file has one of the allowed extensions.
+    if (validFile(fileLocation)){
+        //2. Add the file location to the set.
+        files.insert(fileLocation);
+    }
 
-    //2. Add the file location to the set.
-    files.insert(fileLocation);
+    else{
+        cerr << "File " << fileLocation << " is not a valid image file!" << endl;
+        return false;
+    }
 
     return true;
 }

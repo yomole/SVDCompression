@@ -19,5 +19,6 @@ using sf::Vector2f;
 /// @details button class is a customizable, basic class for a 1 function button.
 class Button : public SpriteBased{
 public:
-    Button(const string& name, const Texture& baseTexture, const Vector2f& location, const std::function<void()>& function);
+    Button(const string& name, const Texture& baseTexture, const Vector2f& location,
+           const std::function<void(vector<string>&)>& function, vector<string>& arguments);
 };
