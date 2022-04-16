@@ -1,19 +1,14 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon Apr 11 00:15:14 2022
-
-@author: Nick
-"""
 import numpy as np
 from numpy.linalg import eig
 from numpy.linalg import norm
+import struct
 
-
-"""
-Possible optimizations - filter out all the things that are possibly 0's to be just
-0's and remove them outright (problems include modifying 'n' variable and being able
-to distinguish between actual eigenvalues in all cases
-"""
+"""NEED TO REMOVE"""
+#sizeRow = 10
+#sizeColumn = 10
+#fileLim = 10
+#charArray = [1,3,4,344]
+"""NEED TO REMOVE"""
 
 class triple:
     def __init__(self, _sigma, _v, _u):
@@ -54,36 +49,85 @@ class SVD:
         #depending on how we want to store them, we can do a variety of different things
         """ Sorting goes here"""
         self.tripleList.sort(key= lambda x: x.sigma, reverse=True)
-        #we should now have a sorted list
-    def test(self):
-        testMatrix = np.zeros((self.m, self.n))
-        for i in range(self.n):
-            #to get back, we want sigma * ui * viT
-            testMatrix = testMatrix + self.sigma[i]*np.outer(self.u[:,i], self.v[:,i])
-            
-            #doing this entire summation should give us back our matrix
-            #doing this up to a value k should give us the approximation
-            #to get the best approx, we want these to be ordered by decreasing simga
         
-        #print(testMatrix)
-        return testMatrix
-    #used to test the SVD approximation for a matrix (still really good)
-    def testApprox(self):
-        testMatrix = np.zeros((self.m, self.n))
-        usedRange = min(self.n, 5)
-        for i in range(usedRange):
-            currSigma = self.tripleList[i].sigma
-            currV = self.tripleList[i].v
-            currU = self.tripleList[i].u
-            testMatrix = testMatrix + currSigma*np.outer(currU,currV)
-        return testMatrix
-            
+    def getKthApprox(self, k):
+        truncList = []
+        for i in range(k):
+            truncList.append(self.tripleList[i])
+        return truncList
+    
+    
+#sizeRow and sizeColumn are imported from c++
+def breakLine(inputString):
+    outList = []
+    currWord = ""
+    for elm in inputString:
+        if not elm == " ":
+            currWord = currWord + elm
+        else: #once we hit a space, we append it to the list and restart
+            outList.append(currWord)
+            currWord = ""
+    outList.append(currWord)
+    return outList
 
-A = np.arange(10000).reshape((100,100))
-#print(A)
-TestSVD = SVD(A)
-deltaA = A - TestSVD.test()
-print(norm(deltaA)) #should be a small value that is about 0
-approxDeltaA = A - TestSVD.testApprox()
-print(norm(approxDeltaA))
-                
+def getK(row, col, size):
+    return (size - 12) // (4*(1+row+col))
+
+"""
+class fileReader:
+    def __init__(self, file):
+        file_obj = open(file, "r")
+        header = file_obj.readline()
+        headerList = breakLine(header)
+        rows = int(headerList[0])
+        columns = int(headerList[1])
+        #now start the main loop
+        multiMatrix = np.zeros((rows, columns, 4))
+        nextLine = ""
+        nextList = []
+        for n in range(4):
+            for i in range(rows):
+                nextLine = file_obj.readline()
+                nextList = breakLine(nextLine)
+                for j in range(columns):
+                    multiMatrix[i,j,n] = 
+"""
+
+def charArrayReader(charList):
+    multiMatrix = np.zeros((sizeRow, sizeColumn, 4))
+    counter = 0
+    for r in range(sizeRow):
+        for c in range(sizeColumn):
+            for n in range(4):
+                counter = counter + 1
+                multiMatrix[r,c,n] = charList[counter]
+    return multiMatrix
+
+
+
+
+#now to break down each matrix into its components and send them out piece by piece
+""" Start of main method"""
+
+bigMatrix = charArrayReader(charArray)
+k = getK(sizeRow, sizeColumn, fileLim)
+print("Printing k value")
+print(k)
+print("Printing each matrix")
+for i in range(4):
+    print(bigMatrix[:,:,i])
+
+
+"""
+bigMatrix = charArrayReader(charArray)
+SVDList = []
+for i in range(4):
+    SVDList.append(SVD(bigMatrix[:,:,i]))
+k = getK(fileLim)
+#double list of triples goes here
+doubleList = []
+for matrix in SVDList:
+    doubleList.append(matrix.getKthApprox(k))
+"""
+        
+        
