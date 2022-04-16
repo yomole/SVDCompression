@@ -27,9 +27,19 @@ struct ChangeImage{
     void operator()(const vector<string>& nameAndArgs);
 };
 
-//In scene file: CycleImages [scene name] [image name] [starting image index] _files_
+//In scene file: CycleImages [scene name] [image name] [starting image index] [_files_/output]
 struct CycleImages{
     void operator()(vector<string>& nameAndArgs);
 };
 
-function<void(vector<string>&)> getFunction(const vector<string>& nameAndArgs);
+//In scene file: Compress [input text box name] [linked checkbox name #1] [linked checkbox name #2] ...
+struct Compress{
+    void operator()(vector<string>& nameAndArgs);
+};
+
+//In scene file: SelectSize [size label] [linked checkbox name #1] [linked checkbox name #2] ...
+struct SelectSize{
+    void operator()(vector<string>& nameAndArgs);
+};
+
+function<void(vector<string>&)> getFunction(vector<string>& nameAndArgs);

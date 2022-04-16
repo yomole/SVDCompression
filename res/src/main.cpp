@@ -64,8 +64,8 @@ int main(int argc, char* argv[]) {
                     }
                 }
             }
-            SceneManager::getView("test").getText("mxv")->setString(std::to_string(Mouse::getPosition(window).x));
-            SceneManager::getView("test").getText("myv")->setString(std::to_string(Mouse::getPosition(window).y));
+            SceneManager::getView("test").getTexts("mxv")->setString(std::to_string(Mouse::getPosition(window).x));
+            SceneManager::getView("test").getTexts("myv")->setString(std::to_string(Mouse::getPosition(window).y));
             window.clear(sf::Color::White);
             SceneManager::drawAll();
             window.display();
@@ -182,8 +182,6 @@ int main(int argc, char* argv[]) {
             }
 
         } while (command != "exit");
-
-
     }
 
     //The SFML Application.

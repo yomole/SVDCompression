@@ -4,7 +4,7 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <unordered_map>
-#include "../ui/view/Scene.h"
+#include "../ui/scene/Scene.h"
 
 //USING STATEMENTS:
 using std::invalid_argument;

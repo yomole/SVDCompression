@@ -15,7 +15,7 @@ void ChangeImage::operator()(const vector<string> &nameAndArgs){
         }
     }
 
-    SceneManager::getView(nameAndArgs.at(1)).getImage(nameAndArgs.at(2))->setTexture(AssetManager::getTexture(nameAndArgs.at(3)), true);
+    SceneManager::getView(nameAndArgs.at(1)).getImages(nameAndArgs.at(2))->setTexture(AssetManager::getTexture(nameAndArgs.at(3)), true);
 }
 
 void CycleImages::operator()(vector<string>& nameAndArgs){
@@ -39,15 +39,14 @@ void CycleImages::operator()(vector<string>& nameAndArgs){
     }
 
     if (curr + 5 < nameAndArgs.size()){
-        cout << SceneManager::getView(sceneName).getImage(imageName)->getPosition().x << " ";
-        cout << SceneManager::getView(sceneName).getImage(imageName)->getPosition().y << endl;
+        cout << SceneManager::getView(sceneName).getImages(imageName)->getPosition().x << " ";
+        cout << SceneManager::getView(sceneName).getImages(imageName)->getPosition().y << endl;
         if (!AssetManager::textureExists(nameAndArgs.at(curr + 5 + 1))){
             if (!(AssetManager::addImage(nameAndArgs.at(curr + 5)))){
                 return;
             }
         }
-
-        SceneManager::getView(sceneName).getImage(imageName)->setTexture(AssetManager::getTexture(nameAndArgs.at(curr + 5 + 1)), true);
+        SceneManager::getView(sceneName).getImages(imageName)->setTexture(AssetManager::getTexture(nameAndArgs.at(curr + 5 + 1)), true);
         curr+=2;
     }
 
@@ -56,7 +55,7 @@ void CycleImages::operator()(vector<string>& nameAndArgs){
 
 }
 
-function<void(vector<string>&)> getFunction(const vector<string>& nameAndArgs){
+function<void(vector<string>&)> getFunction(vector<string>& nameAndArgs){
     if(nameAndArgs.at(0) == "ChangeScene"){
         return function<void(const vector<string>&)>(ChangeScene{});
     }

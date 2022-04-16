@@ -12,11 +12,11 @@
  */
 
 void SVDAlgorithm(const string &size, set<string> &files){
-    string SVDPython = "res/python/SVD.py";
-    unsigned int sizeNum = 0;
+    string SVDPython = "../res/python/SVD.py";
+    unsigned long long sizeNum = 0;
 
-    //If we cannot convert the size to kilobytes, or the size isn't valid, we cannot continue with the algorithm.
-    if (!sizeToKilobytes(size, sizeNum)){
+    //1. Try to convert the target size to bytes.
+    if (!sizeToBytes(size, sizeNum)){
         return;
     }
 
@@ -34,30 +34,47 @@ void SVDAlgorithm(const string &size, set<string> &files){
     removeBadSizes(sizeNum, files);
 
     //1. Check if the file exists.
-    if (exists(SVDPython)){
+    if (exists(SVDPython)) {
 
-    //2. Import modules used in python file.
-    auto modules = py::dict();
+        //2. Import modules used in python file.
+        auto modules = py::dict();
 
-    //equivalent to import numpy as np.
-    py::module_ np = py::module_::import("numpy");
-    modules["np"] = np;
+        //equivalent to import numpy as np.
+        py::module_ np = py::module_::import("numpy");
+        modules["np"] = np;
 
-    //equivalent to from numpy.linalg import eig
-    py::module_ linalg = py::module_::import("numpy.linalg");
-    modules["eig"] = linalg.attr("eig");
+        //equivalent to from numpy.linalg import eig
+        py::module_ linalg = py::module_::import("numpy.linalg");
+        modules["eig"] = linalg.attr("eig");
 
-    //3. Cast the file list to a python argument.
-    auto arguments = py::dict();
-    arguments["fileList"] = py::cast(&files);
+        //equivalent to from numpy.linalg import eig
+        modules["norm"] = linalg.attr("norm");
 
-    //4. Run the python script.
-        try {
-            eval_file(SVDPython, modules, arguments);
-            //TODO: Cast to appropriate C++ object.
-        }
-        catch(cast_error& castError){
-            cerr << "There was a problem when casting return of SVD algorithm to a C++ data object!" << endl;
+        for (const string &file: files) {
+            unsigned int row,col;
+            vector<unsigned char> array;
+
+            //Convert the image to an array of unsigned chars (pixel 0: R,G,B,A; pixel 1: R,G,B,A;....)
+            if (!imageToArray(file, array, row, col)) {
+                cerr << "Could not convert file " << file << " to a character array! Skipping..." << endl;
+                continue;
+            }
+
+            //3. Cast the file list to a python argument.
+            auto arguments = py::dict();
+            arguments["fileLocation"] = py::cast(&file);
+            arguments["fileLim"] = py::cast(sizeNum);
+            arguments["charArray"] = py::cast(&array);
+            arguments["sizeRow"] = py::cast(row);
+            arguments["sizeColumn"] = py::cast(col);
+
+            //4. Run the python script.
+            try {
+                eval_file(SVDPython, modules, arguments);
+            }
+            catch (cast_error &castError) {
+                cerr << "There was a problem when casting return of SVD algorithm to a C++ data object!" << endl;
+            }
         }
     }
 
@@ -67,7 +84,7 @@ void SVDAlgorithm(const string &size, set<string> &files){
     }
 }
 
-bool sizeToKilobytes(const string& size, unsigned int& sizeNum){
+bool sizeToBytes(const string& size, unsigned long long& sizeNum){
     //1. Isolate the character for kilo/megabyte and the rest of the string for numbers.
     unsigned int labelPos = size.length()-1;
     char sizeLabel = size.at(labelPos);
@@ -87,13 +104,14 @@ bool sizeToKilobytes(const string& size, unsigned int& sizeNum){
     switch(sizeLabel){
         case 'k':{}
         case 'K':{
+            sizeNum *= 1024;
             break;
         }
 
         //Convert megabytes to kilobytes.
         case 'm':{}
         case 'M':{
-            sizeNum *= 1024;
+            sizeNum *= (1024 * 1024);
             break;
         }
 
@@ -115,7 +133,7 @@ void removeBadSizes(const unsigned int& fileSize, set<string>& files){
 
         //3. Using the directory entry, check the file size of the file with the fileSize here.
         auto actualSize = file.file_size();
-        unsigned long long fileSizeBytes = fileSize * 1024;
+        unsigned long long fileSizeBytes = fileSize;
 
         if (actualSize < fileSizeBytes){
             cerr << "File " << file.path() << " is smaller than the target for compression! Removing from file list..." << endl;
@@ -126,4 +144,31 @@ void removeBadSizes(const unsigned int& fileSize, set<string>& files){
     }
 
     cout << "Removed " << removed << " files that were smaller than the size target." << endl;
+}
+
+bool imageToArray(const string& fileLocation, vector<unsigned char>& array, unsigned int& rows, unsigned int& cols){
+    //1. Create a sf image for the file.
+    sf::Image image;
+
+    //2. Load the image from the file.
+    if (!image.loadFromFile(fileLocation)){
+        cerr << "Image " << fileLocation << " could not be loaded!" << endl;
+        return false;
+    }
+
+    //3. Get the number of bytes, make a suitable array, and get a pointer to the RGBA array.
+    unsigned long long numBytes = image.getSize().x * image.getSize().y * 4;
+
+    rows = image.getSize().x;
+    cols= image.getSize().y;
+
+    array.resize(numBytes);
+    auto* pointer = image.getPixelsPtr();
+
+    //4. Loop through all indies of the RGBA array and copy the values to our array.
+    for (unsigned long long i = 0; i < numBytes; i++){
+        array.at(i) = *(pointer++);
+    }
+
+    return true;
 }
