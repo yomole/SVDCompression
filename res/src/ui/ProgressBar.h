@@ -25,7 +25,7 @@ class ProgressBar : public UIElement {
 
 public:
 
-    ProgressBar(const string& name, const Vector2f& size, const Vector2f& position = Vector2f(0,0), vector<string> args = vector<string>());
+    ProgressBar(const string& name, const Vector2f& size, const Vector2f& position = Vector2f(0,0));
 
     void setPercentage(float percentage);
     const float& getPercentage() const;

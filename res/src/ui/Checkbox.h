@@ -8,7 +8,7 @@ class Checkbox : public Button {
 
 public:
     Checkbox(const string& name, const Texture& baseTexture, const Vector2f& location,
-             const std::function<void(vector<string>&)>& function, vector<string>& arguments, bool checked = false);
+             const std::function<void()>& function, bool checked = false);
 
     bool isChecked() const;
 };

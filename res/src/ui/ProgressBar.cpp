@@ -1,6 +1,6 @@
 #include "ProgressBar.h"
 
-ProgressBar::ProgressBar(const string &name, const Vector2f& size, const Vector2f& position, vector<string> args) : UIElement(name, args){
+ProgressBar::ProgressBar(const string &name, const Vector2f& size, const Vector2f& position) : UIElement(name) {
     //1. Create the outline for the progress bar.
     outline = RectangleShape(size);
     outline.setFillColor(Color::Transparent);

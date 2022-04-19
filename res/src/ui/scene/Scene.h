@@ -32,11 +32,7 @@ using sf::Texture;
 using sf::Color;
 using sf::Vector2f;
 
-
-
 class Scene {
-        string name;
-
         unordered_map<string, unique_ptr<Button>> buttons;
         unordered_map<string, unique_ptr<Checkbox>> checkboxes;
         unordered_map<string, unique_ptr<ProgressBar>> progressBars;
@@ -44,38 +40,59 @@ class Scene {
         unordered_map<string, unique_ptr<Sprite>> images;
 public:
 
-    explicit Scene(const string &fileLocation);
+    ///@brief Creates a blank scene.
+    Scene();
 
-    //Creates all UI Elements from a file
-    void deserialize(const string &fileLocation);
+    /* * * * * * * * * * * * *
+     * ELEMENT  CONSTRUCTORS *
+     * * * * * * * * * * * * */
 
-    void addButton(istringstream &parse);
+    void addButton(const string& elementName, const string& textureName, const Vector2f& position,
+                   const function<void()>& function);
 
-    void addProgressBar(istringstream &parse);
+    void addText(const string& elementName, const Vector2f& position, const Font& font, unsigned int fontSize,
+                 const string& text);
 
-    void addText(istringstream &parse);
+    void addImage(const string& elementName, const string& fileLocation, const Vector2f& position,
+                 const Vector2f& scale = Vector2f(1, 1));
 
-    void addImage(istringstream &parse);
-
-    void addCheckbox(istringstream &parse);
+    /* * * * * * * * *
+     * MAP ACCESSORS *
+     * * * * * * * * */
 
     unordered_map<string, unique_ptr<Button>> &getButtons();
 
+    ///@deprecated
     unordered_map<string, unique_ptr<ProgressBar>> &getProgressBars();
 
     unordered_map<string, unique_ptr<Text>> &getTexts();
 
     unordered_map<string, unique_ptr<Sprite>> &getImages();
 
+    ///@deprecated
     unordered_map<string, unique_ptr<Checkbox>> &getCheckboxes();
+
+    /* * * * * * * * * * *
+     * ELEMENT ACCESSORS *
+     * * * * * * * * * * */
 
     unique_ptr<Button> &getButtons(const string &elementName);
 
+    ///@deprecated
     unique_ptr<ProgressBar> &getProgressBars(const string &elementName);
 
     unique_ptr<Text> &getTexts(const string &elementName);
 
     unique_ptr<Sprite> &getImages(const string &elementName);
 
+    ///@deprecated
     unique_ptr<Checkbox> &getCheckboxes(const string &elementName);
+
+    /* * * * * * * * * * * * * * * * *
+     * SERIALIZE & PARSING FUNCTIONS *
+     * * * * * * * * * * * * * * * * */
+
+    //Parses the arguments of a UI element.
+    ///@deprecated
+    void parseArgs(istringstream& parse, vector<string>& args);
 };

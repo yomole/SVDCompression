@@ -99,8 +99,8 @@ def charArrayReader(charList):
     for r in range(sizeRow):
         for c in range(sizeColumn):
             for n in range(4):
-                counter = counter + 1
                 multiMatrix[r,c,n] = charList[counter]
+                counter = counter + 1
     return multiMatrix
 
 

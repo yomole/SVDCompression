@@ -4,6 +4,7 @@
 #include <functional>
 #include <vector>
 #include "../../managers/SceneManager.h"
+#include "../../python/PythonScript.h"
 
 using std::string;
 using std::to_string;
@@ -27,8 +28,13 @@ struct ChangeImage{
     void operator()(const vector<string>& nameAndArgs);
 };
 
-//In scene file: CycleImages [scene name] [image name] [starting image index] [_files_/output]
-struct CycleImages{
+//In scene file: CycleImagesFwd [scene name] [image name] [linked button name] [starting image index] [_FILES_/_COMPRESSED FILES_]
+struct CycleImagesFwd{
+    void operator()(vector<string>& nameAndArgs);
+};
+
+//In scene file: CycleImagesRev [scene name] [image name] [linked button name] [starting image index] [_FILES_/_COMPRESSED FILES_]
+struct CycleImagesRev{
     void operator()(vector<string>& nameAndArgs);
 };
 

@@ -39,8 +39,6 @@ set(sources
         res/src/python/PythonScript.h
         res/src/ui/scene/Scene.cpp
         res/src/ui/scene/Scene.h
-        res/src/ui/functions/ButtonFunctions.h
-        res/src/ui/functions/ButtonFunctions.cpp
         res/src/ui/Checkbox.cpp
         res/src/ui/Checkbox.h)
 
