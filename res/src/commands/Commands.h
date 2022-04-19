@@ -14,7 +14,6 @@ enum Names{
         ADD,
         ADDF,
         COMPRESS,
-        EXPORT,
         HELP,
         LS,
         RM,

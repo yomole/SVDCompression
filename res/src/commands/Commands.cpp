@@ -37,10 +37,14 @@ void getHelp(int command){
         }
 
         case COMPRESS:{
-            cout    << "compress [Size][K/k/M/m/B/b]"
+            cout    << "compress [Size][K/k/M/m/B/b] [file format]"
                     << endl
-                    << "\tRuns the compression algorithms on the files in the program file list until we are at or a "
-                       "bit below the target file size. File sizes can be in bytes, kilobytes, and megabytyes."
+                    << "\tRuns the compression algorithms on the files in the program file list until we reach the "
+                       "target file size and then exports the compressed images."
+                    << endl
+                    << "\tFile sizes can be in bytes, kilobytes, or megabytes."
+                    << endl
+                    << "\tValid file extensions include: \".jpg\", \".png\", \".bmp\", and \".tga\"."
                     << endl;
             break;
         }
@@ -69,38 +73,27 @@ void getHelp(int command){
         }
 
         case LS:{
-            cout    << "ls"
+            cout    << "ls [-c]"
                     << endl
-                    << "\tLists all of the files on the file list."
+                    << "\tLists all of the files on the file list. Use with \"-c\" to list the compressed files."
                     << endl;
             break;
         }
 
         case HELP:{
-            cout    << "help [command]"
+            cout    << "help [command/all]"
                     << endl
-                    << "\tDisplays information about a command and its arguments."
-                    << endl;
-            break;
-        }
-
-        case EXPORT:{
-            cout    << "export [image name] [file format]"
-                    << endl
-                    << "\tExports a compressed file to the output folder in the specified valid file format "
-                       "(without the period)."
-                    << endl
-                    << "\tValid file formats include: jpg, png, tga, bmp."
-                    << endl
-                    << "\tNOTE: You can use \"*\" instead to export all files currently in the compressed files list"
+                    << "\tDisplays information about a command and its arguments. Use \"all\" to get a list of all the "
+                       "commands available."
                     << endl;
             break;
         }
 
         case SHOW:{
-            cout    << "show \"[File Location]\""
+            cout    << "show \"[File Location/all]\""
                     << endl
-                    << "\tDisplays the specified image."
+                    << "\tDisplays the specified image. Use \"all\" to display all compressed and original images in the"
+                       " program."
                     << endl;
             break;
         }
@@ -109,7 +102,7 @@ void getHelp(int command){
 }
 
 void listCommands(){
-    cout << "Unknown command! Here are a list of available commands: " << endl;
+    cout << "Commands available in SVDCompression:" << endl;
     for (unsigned int i = 0; i < ALL; i++){
         cout <<"- ";
         getHelp(i);

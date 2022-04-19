@@ -5,6 +5,7 @@ unordered_map<string,Texture> AssetManager::textures;
 unordered_map<string,Font> AssetManager::fonts;
 set<string> AssetManager::files;
 set<string> AssetManager::compressedFiles;
+bool AssetManager::loaded = false;
 string AssetManager::prefix;
 string AssetManager::textureFolder;
 string AssetManager::fontFolder;
@@ -12,9 +13,8 @@ string AssetManager::outputFolder;
 
 AssetManager::AssetManager(const string& prefixIn){
     //1. Set the texture and fonts folder.
-    AssetManager::prefix = prefixIn;
-    textureFolder = prefix + "res\\textures\\";
-    fontFolder = prefix + "res\\fonts\\";
+    textureFolder = prefix + "res/textures/";
+    fontFolder = prefix + "res/fonts/";
     outputFolder = prefix + "output/";
 
     //3. Attempt to load the missing texture and default font.
@@ -30,6 +30,7 @@ AssetManager::AssetManager(const string& prefixIn){
     AssetManager::textures.at(MISSING_TEXTURE.data()).setRepeated(true);
 
     loadAll();
+    loaded = true;
 }
 
 bool AssetManager::addTexture(const string& textureName) {
@@ -106,8 +107,7 @@ bool AssetManager::addImage(const Image& image, const string &fileLocation){
 }
 
 bool AssetManager::exportImage(const Image& image, const string& fileLocation){
-
-    //2. Alert the user that the image (if any) at the location will be overwritten.
+    //1. Alert the user that the image (if any) at the location will be overwritten.
     if (fs::exists(fileLocation)){
         cerr << "File at " << fileLocation << " already exists! Overwriting..." << endl;
     }
@@ -334,15 +334,15 @@ bool AssetManager::delFolder(const string& folderLocation, int fileset) {
     return true;
 }
 
-bool AssetManager::validFile(const string& filePath){
+bool AssetManager::validFile(const string& fileLocation){
     //1. Take the filepath and isolate the extension.
-    int dot = filePath.find_last_of('.');
+    int dot = fileLocation.find_last_of('.');
 
     if (dot == string::npos){
         return false;
     }
 
-    string extension = filePath.substr(dot, filePath.length() - dot);
+    string extension = fileLocation.substr(dot, fileLocation.length() - dot);
 
     //2. Check the extension against those supported by the program and SFML.
     for (const string_view& i : FILE_EXTENSIONS){
@@ -420,7 +420,7 @@ void AssetManager::loadAll(){
     }
 }
 
-bool AssetManager::csvToImage(const string &fileLocation, const string& fileFormat) {
+Image AssetManager::csvToImage(const string &fileLocation, const string& fileFormat) {
     ifstream file(fileLocation);
     istringstream parse;
     string rows, cols;
@@ -469,29 +469,12 @@ bool AssetManager::csvToImage(const string &fileLocation, const string& fileForm
 
         image.create(rowN, colN / 4, array);
 
-        //4. Create the output fileLocation which includes new image name (C[name].
-        string newFileLocation =
-                "C_" + fs::path(fileLocation).filename().string();
-        newFileLocation.replace(newFileLocation.find_last_of('.') + 1, 3, fileFormat);
-
-        //5. Check if it is a valid file.
-        if (!validFile(newFileLocation)){
-            cerr << "File format " << fileFormat << " is not valid!" << endl;
-            return false;
-        }
-
-        //5. Export the image.
-        if (!exportImage(image, outputFolder + newFileLocation)) {
-            cerr << "Could not export image to " << outputFolder + newFileLocation;
-            return false;
-        }
-
-        return true;
+        return image;
     }
 
     else{
-        cerr << "File " << fileLocation << " does not exist!" << endl;
-        return false;
+        cerr << "File " << fileLocation << " does not exist! Returning missing texture..." << endl;
+        return AssetManager::getTexture(MISSING_TEXTURE.data()).copyToImage();
     }
 }
 
@@ -501,4 +484,12 @@ const string &AssetManager::getPrefix(){
 
 void AssetManager::setPrefix(const string &prefixIn){
     AssetManager::prefix = prefix;
+}
+
+const string& AssetManager::getOutputFolder(){
+    return outputFolder;
+}
+
+bool AssetManager::isLoaded(){
+    return loaded;
 }

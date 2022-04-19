@@ -48,6 +48,7 @@ enum FILESET{
 ///Handles asset loading and assignment for the entire application.
 ///Assets include textures, fonts, and files.
 class AssetManager {
+    static bool loaded; ///< Boolean representing if the Asset Manager has been initialized.
     static string prefix; ///< Prefix used to access files outside of bin/
 
     static unordered_map<string,Texture> textures; ///< Texture map for easy access using the name of the texture.
@@ -61,16 +62,16 @@ class AssetManager {
     static string outputFolder; ///< Location of the output folder for the compressed images.
 
 public:
-    /// Default Constructor.
+    /// Constructor.
     /// Generates the AssetManager class with the default texture location prefix + "res/textures".
     /// Also creates a missing texture for later use.
     /// @param prefix the path from the executable to the folder containing res/. The default is a blank string.
     /// @warning requires that the missing texture and default font exist within res/textures and res/fonts.
     explicit AssetManager(const string &prefixIn = prefix);
 
-    /* * * * * * * * * * *
-     * TEXTURE FUNCTIONS *
-     * * * * * * * * * * */
+    /* * * * * * * * * * * * * * * *
+     * TEXTURE AND IMAGE FUNCTIONS *
+     * * * * * * * * * * * * * * * */
 
     /// @brief Adds the texture with the specified name to the asset manager.
     /// @param textureName the filename of the texture to be added.
@@ -120,15 +121,35 @@ public:
      * FILE    FUNCTIONS *
      * * * * * * * * * * */
 
+    /// @brief Adds a file to a filelist.
+    /// @param fileLocation the location of the file to add.
+    /// @param fileset the fileset to add the file to (use the enum).
+    /// @returns A boolean representing success in adding the file to the filelist.
     static bool addFile(const string& fileLocation, int fileset = NORMAL);
 
+    /// @brief Adds all files from a folder to a filelist.
+    /// @param folderLocation the location of the folder to add the files from.
+    /// @param fileset the fileset to add the files to (use the enum).
+    /// @returns A boolean representing success in adding the files to the fileset.
     static bool addFolder(const string& folderLocation, int fileset = NORMAL);
 
+    /// @brief Removes a file from a filelist.
+    /// @param fileLocation the location of the file to remove.
+    /// @param fileset the fileset to remove the file from (use the enum).
+    /// @returns A boolean representing success in removing the file from the filelist.
     static bool delFile(const string& fileLocation, int fileset = NORMAL);
 
+    /// @brief Removes all files located in a folder from a fileset.
+    /// @param fileLocation the location of the folder that the removed files are from.
+    /// @param fileset the fileset to remove the files from (use the enum).
+    /// @returns A boolean representing success in removing the files from the filelist.
     static bool delFolder(const string& folderLocation, int fileset = NORMAL);
 
-    static bool validFile(const string& filePath);
+    /// @brief Checks that a file is a valid image file.
+    /// @param fileLocation the location of the file to check.
+    /// @returns A boolean representing the validity of the image file.
+    /// @warning Only checks the extension, not the actual contents.
+    static bool validFile(const string& fileLocation);
 
     static set<string>& getFiles();
 
@@ -144,16 +165,23 @@ public:
     static void loadAll();
 
     /// @brief Converts the space-separated file produced by the SVD algorithm to an image file readable by SFML.
-    static bool csvToImage(const string& fileLocation, const string& fileFormat = "png");
+    static Image csvToImage(const string& fileLocation, const string& fileFormat = "png");
 
     /* * * * * * * * * * * * * *
      * MISCELLANEOUS FUNCTIONS *
      * * * * * * * * * * * * * */
 
-    ///@brief Returns the prefix loaded into the AssetManager.
+    ///@returns The prefix loaded into the AssetManager.
     static const string& getPrefix();
 
     ///@brief Sets the prefix for the AssetManager.
+    ///@param prefixIn The prefix to set the AssetManager to.
     ///@sa AssetManager();
     static void setPrefix(const string& prefixIn);
+
+    ///@returns The output folder registered in AssetManager.
+    static const string& getOutputFolder();
+
+    ///@returns The loaded boolean.
+    static bool isLoaded();
 };

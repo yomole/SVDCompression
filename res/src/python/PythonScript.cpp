@@ -4,20 +4,30 @@
 //Literally all of them were used, and some code snippets were modified to suit our implementation
 //(I'm never embedding Python ever again ;_; ).
 
-void SVDAlgorithm(const string &size, set<string> &files, const string& scriptLocation){
+void SVDAlgorithm(const string& scriptLocation, const string& size, const string& imageFormat,
+                  set<string>& files) {
     unsigned long long sizeNum = 0;
 
-    //1. Try to convert the target size to bytes.
-    if (!sizeToBytes(size, sizeNum)){
+    //1. Make sure that the image format is valid.
+    if (!AssetManager::validFile(imageFormat)){
+        cerr << "File format \"" << imageFormat << "\" is not valid!" << endl;
+        cerr << "(Did you forget the \".\"?)" << endl;
         return;
     }
-    else if (sizeNum == 0){
+
+
+    //1. Try to convert the target size to bytes.
+    if (!sizeToBytes(size, sizeNum)) {
+        return;
+    }
+
+    else if (sizeNum == 0) {
         cerr << "Compression target size cannot be 0!" << endl;
         return;
     }
 
     //Check if the files list is empty when we first run the program.
-    else if (files.empty()){
+    else if (files.empty()) {
         cerr << "There are no files in the file list!" << endl;
         return;
     }
@@ -31,58 +41,99 @@ void SVDAlgorithm(const string &size, set<string> &files, const string& scriptLo
         return;
     }
 
-    //1. Check if the script file exists.
-    if (exists(scriptLocation)) {
-        auto global = py::dict();
-        auto local = py::dict();
+    cout << "Running SVD Algorithm on " << files.size() << " files..." << endl << endl;
 
-        //2. Import global used in python file.
-        //equivalent to import struct.
-        py::module_ structMod = py::module_::import("struct");
-        global["struct"] = structMod;
+    auto global = py::dict();
+    auto local = py::dict();
 
-        //equivalent to import numpy as np.
-        py::module_ np = py::module_::import("numpy");
-        global["np"] = np;
+    //2. Import global used in python file.
+    //equivalent to import struct.
+    py::module_ structMod = py::module_::import("struct");
+    global["struct"] = structMod;
 
-        //equivalent to from numpy.linalg import eig
-        py::module_ linalg = py::module_::import("numpy.linalg");
-        global["eig"] = linalg.attr("eig");
+    //equivalent to import numpy as np.
+    py::module_ np = py::module_::import("numpy");
+    global["np"] = np;
 
-        //equivalent to from numpy.linalg import eig
-        global["norm"] = linalg.attr("norm");
+    //equivalent to from numpy.linalg import eig
+    py::module_ linalg = py::module_::import("numpy.linalg");
+    global["eig"] = linalg.attr("eig");
 
-        for (const string &file: files) {
-            unsigned int row,col;
-            vector<unsigned char> array;
+    //equivalent to from numpy.linalg import eig
+    global["norm"] = linalg.attr("norm");
 
-            //Convert the image to an array of unsigned chars (pixel 0: R,G,B,A; pixel 1: R,G,B,A;....)
-            if (!imageToArray(file, array, row, col)) {
-                cerr << "Could not convert file " << file << " to a character array! Skipping..." << endl;
-                continue;
+    for (const string &file: files) {
+        cout << "File: " << file << endl;
+
+        unsigned int row, col;
+        vector<unsigned char> array;
+
+        //Convert the image to an array of unsigned chars (pixel 0: R,G,B,A; pixel 1: R,G,B,A;....)
+        cout << "\tConverting the image into an RGBA array...";
+        if (!imageToArray(file, array, row, col)) {
+            cerr << endl << "\tCould not convert file " << file << " to a character array! Skipping..." << endl;
+            continue;
+        }
+        cout << "Done!" << endl;
+
+        //3. Cast the required arguments to python variables.
+        cout << "\tConstructing Python arguments for SVD Algorithm...";
+        global["fileLocation"] = py::cast(&file);
+        global["fileLim"] = py::cast(sizeNum);
+        global["charArray"] = py::cast(&array);
+        global["sizeRow"] = py::cast(row);
+        global["sizeColumn"] = py::cast(col);
+        cout << "Done!" << endl;
+
+        //4. Run the script and add the file to the list of compressed files, if successful.
+        cout << "\tProcessing image...";
+        if (runPy(scriptLocation, global, local)) {
+            cout << "Done!" <<endl;
+            cout << "\tExporting and adding to compressed files list...";
+
+            //4. Create the output fileLocation which includes new image name (C[name].
+            string fileName = fs::path(file).filename().string();
+            string newFileLocation = AssetManager::getOutputFolder() + +"C_" + fileName;
+            newFileLocation.replace(newFileLocation.find_last_of('.'), 4, imageFormat);
+
+            //5. Export the image.
+            string csvLocation = AssetManager::getOutputFolder() + fileName;
+            csvLocation.replace(newFileLocation.find_last_of('.') + 1, 3, "csv");
+            if (!AssetManager::exportImage(AssetManager::csvToImage(csvLocation),
+                                           newFileLocation)) {
+                cerr << endl << "\tCould not export image to " << newFileLocation << endl;
             }
 
-            //3. Cast the required arguments to python variables.
-            global["fileLocation"] = py::cast(&file);
-            global["fileLim"] = py::cast(sizeNum);
-            global["charArray"] = py::cast(&array);
-            global["sizeRow"] = py::cast(row);
-            global["sizeColumn"] = py::cast(col);
-
-            //4. Run the python script.
-            try {
-                eval_file(scriptLocation, global, local);
+            //6. Add the new image to the Asset Manager.
+            if (!AssetManager::addFile(newFileLocation)){
+                    cerr << endl << "Could not add the processed file to the Asset Manager! You will not be able to "
+                                    "see the image in the program." << endl;
             }
-            catch(py::error_already_set& exception){
-                cerr << "Program encountered an issue when running " << scriptLocation << endl;
-                exception.trace();
+
+            else {
+                cerr << endl << "\tCould not process " << file << "!" << endl;
             }
         }
+        cout << "Done!" << endl;
+    }
+}
+
+bool runPy(const string& fileLocation, const py::dict& global, const py::dict& local){
+    //1. Check if the Python file exists.
+    if (fs::exists(fileLocation)){
+        try{
+            eval_file(fileLocation, global, local);
+        }
+        catch(py::error_already_set& exception){
+            cerr << "Program encountered a Python issue when running " << fileLocation << endl;
+            exception.trace();
+        }
+        return true;
     }
 
     else{
         cerr << "SVD Algorithm was not found!" << endl;
-        return;
+        return false;
     }
 }
 

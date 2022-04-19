@@ -39,6 +39,7 @@ const unsigned int IMAGE_MARGIN = 8;
 int main(int argc, char* argv[]) {
 
     cout << "Starting directory is: " << (getPrefix().empty() ? "SVDCompression\\" : "SVDCompression\\bin") << endl;
+    AssetManager::setPrefix(getPrefix().data());
 
     //Load the python interpreter to keep it alive for as long as possible.
     scope = new py::scoped_interpreter{};
@@ -81,67 +82,104 @@ int main(int argc, char* argv[]) {
         if (isCommand(command, args, "add")) {
             if (command == "help" || args.size() != 1) {
                 getHelp(ADD);
-            } else if (args.size() == 1) {
+            }
+
+            else if (args.size() == 1) {
                 AssetManager::addFile(args.at(0));
             }
-        } else if (isCommand(command, args, "addf")) {
-            if (command == "help" || args.size() != 1) {
-                getHelp(ADDF);
-            } else if (args.size() == 1) {
-                AssetManager::addFolder(args.at(0));
-            }
-        } else if (isCommand(command, args, "rm")) {
-            if (command == "help" || args.size() != 1) {
-                getHelp(RM);
-            } else if (args.size() == 1) {
-                AssetManager::delFile(args.at(0));
-            }
-        } else if (isCommand(command, args, "rmf")) {
-            if (command == "help" || args.size() != 1) {
-                getHelp(RMF);
-            } else if (args.size() == 1) {
-                AssetManager::delFolder(args.at(0));
-            }
-        } else if (isCommand(command, args, "ls")) {
-            if (command == "help") {
-                getHelp(LS);
-            } else {
-                AssetManager::listFiles();
-            }
-        } else if (isCommand(command, args, "compress")) {
-            if (command == "help" || args.size() != 1) {
-                getHelp(COMPRESS);
-            } else if (args.size() == 1) {
-                SVDAlgorithm(args.at(0), AssetManager::getFiles(), AssetManager::getPrefix() + "res/python/SVD.py");
-            }
-        } else if (isCommand(command, args, "export")) {
-            if (command == "help" || args.size() != 1) {
-                getHelp(EXPORT);
-            } else if (args.size() == 1) {
-                AssetManager::csvToImage(AssetManager::getPrefix() + "output/testOutput.txt", args.at(0));
-            }
-        } else if (isCommand(command, args, "show")) {
-            if (command == "help" || args.size() != 1) {
-                getHelp(SHOW);
-            } else if (args.size() == 1 && args.at(0) != "all") {
-                showImage(args.at(0));
-            } else{
-                showImages();
-            }
-        } else if (isCommand(command, args, "about")) {
-            if (command == "help") {
-                getHelp(ABOUT);
-            } else {
-                printAbout();
-            }
-        } else if (isCommand(command, args, "help")) {
-            getHelp(HELP);
         }
 
-        //Display all commands that are available along with their breakdown.
+        else if (isCommand(command, args, "addf")) {
+            if (command == "help" || args.size() != 1) {
+                getHelp(ADDF);
+            }
+
+            else if (args.size() == 1) {
+                AssetManager::addFolder(args.at(0));
+            }
+        }
+
+        else if (isCommand(command, args, "rm")) {
+            if (command == "help" || args.size() != 1) {
+                getHelp(RM);
+            }
+
+            else if (args.size() == 1) {
+                AssetManager::delFile(args.at(0));
+            }
+        }
+
+        else if (isCommand(command, args, "rmf")) {
+            if (command == "help" || args.size() != 1) {
+                getHelp(RMF);
+            }
+
+            else if (args.size() == 1) {
+                AssetManager::delFolder(args.at(0));
+            }
+        }
+
+        else if (isCommand(command, args, "ls")) {
+            if (command == "help" || args.size() > 1) {
+                getHelp(LS);
+            }
+
+            else if (args.size() == 1 && args.at(0) == "-c"){
+                AssetManager::listFiles(COMPRESSED);
+            }
+
+            else{
+                AssetManager::listFiles();
+            }
+        }
+
+        else if (isCommand(command, args, "compress")) {
+            if (command == "help" || args.size() != 2) {
+                getHelp(COMPRESS);
+            }
+
+            else if (args.size() == 2) {
+                SVDAlgorithm(AssetManager::getPrefix() + "res/python/SVD.py", args.at(0), args.at(1));
+            }
+        }
+
+        else if (isCommand(command, args, "show")) {
+            if (command == "help" || args.size() != 1) {
+                getHelp(SHOW);
+            }
+
+            else if (args.size() == 1 && args.at(0) != "all") {
+                showImage(args.at(0));
+            }
+
+            else{
+                showImages();
+            }
+        }
+
+        else if (isCommand(command, args, "about")) {
+            if (command == "help") {
+                getHelp(ABOUT);
+            }
+
+            else {
+                printAbout();
+            }
+        }
+
+        else if (isCommand(command, args, "help")) {
+            if (args.size() == 1 && args.at(0) == "all"){
+                listCommands();
+            }
+            else{
+                getHelp(HELP);
+            }
+        }
+
+        //Display a message indicating that there was a bad command.
         else {
             if (command != "exit") {
-                listCommands();
+                cout << "Invalid Command! Use \"help [command]\" or \"help [all]\" for help with commands." << endl;
             }
         }
 
@@ -245,7 +283,11 @@ void showImage(const string& fileLocation){
         dispImage.setScale(scales);
         sf::RenderWindow window(sf::VideoMode(dispImage.getGlobalBounds().width, dispImage.getGlobalBounds().height),
                                 "Media Compression by iCompression ~ show " + fileLocation, sf::Style::Close);
-        AssetManager("");
+
+        if (!AssetManager::isLoaded()){
+            AssetManager("");
+        }
+
         while(window.isOpen()) {
             Event event{};
             while (window.pollEvent(event)) {
@@ -265,6 +307,20 @@ void showImage(const string& fileLocation){
 }
 
 void showImages(){
+
+        if (AssetManager::getFiles().empty()){
+            cerr << "No files were loaded into the program!" << endl;
+            return;
+        }
+
+        //TODO: Remove comment below in final build!
+        /*
+        if (AssetManager::getCompressedFiles().empty()){
+            cerr << "No files were compressed by the program!" << endl;
+            return;
+        }
+        */
+
         //2. Alert the user that the images will be displayed and they will be required to close window.
         cout << "Displaying compressed images." << endl << "Close the window to continue..." << endl;
 
@@ -272,7 +328,11 @@ void showImages(){
         sf::RenderWindow window(sf::VideoMode(0, 0),
                                 "Media Compression by iCompression: Qualitative Comparison", sf::Style::Close);
         window.setFramerateLimit(60);
-        AssetManager("");
+
+        if (!AssetManager::isLoaded()){
+            AssetManager("");
+        }
+
         SceneManager sceneManager(&window);
         SceneManager::addScene("Images");
         SceneManager::changeScene("Images");
