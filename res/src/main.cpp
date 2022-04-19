@@ -6,35 +6,32 @@
 #include <fstream>
 #include <csignal>
 #include "managers/AssetManager.h"
-#include "managers/SceneManager.h"
 #include "commands/Commands.h"
 #include "python/PythonScript.h"
+#include "ui/viewer/ImageViewer.h"
 
 using sf::Event;
 using sf::Mouse;
-using sf::Vector2u;
 using std::cin;
 using std::cout;
 using std::string;
-using std::rand;
 using std::getline;
 using std::istringstream;
 using std::vector;
 using std::ifstream;
 
 //FUNCTION PROTOTYPES:
+///@brief Checks if a command is valid and is pointing to a target command.
 bool isCommand(const string& command, const vector<string>& args, const string& target);
-void parseArgs(istringstream& parse, vector<string>& args);
-void printAbout();
-string getPrefix();
-void showImage(const string& fileLocation);
-void showImages();
-void adjustWindow(sf::RenderWindow& window, unique_ptr<Sprite>& original, unique_ptr<Sprite>& compressed,
-                  unique_ptr<Button>& forward, unique_ptr<Button>& reverse);
 
-//CONSTANTS:
-const float VIDEOMODE_SCALE = 2;
-const unsigned int IMAGE_MARGIN = 8;
+///@brief Parses a line into arguments. Arguments with quotes are read until the ending quote.
+void parseArgs(istringstream& parse, vector<string>& args);
+
+///@brief Prints the info contained in the README.md file.
+void printAbout();
+
+///@brief Checks the working directory and gets the prefix which ensures we are running in SVDCompression/
+string getPrefix();
 
 int main(int argc, char* argv[]) {
 
@@ -44,12 +41,25 @@ int main(int argc, char* argv[]) {
     //Load the python interpreter to keep it alive for as long as possible.
     scope = new py::scoped_interpreter{};
 
-    cout << "Media Compression by iCompression: CLI Mode" << endl;
-    ifstream file;
+    cout << "Media Compression by iCompression";
 
-    if (argc > 2 && string(argv[2]) == "-file") {
-        file.open(argv[3]);
+    //Load the command file, if the argument is there.
+    ifstream file;
+    if (argc == 2) {
+        file.open(argv[1]);
+        cout << ": Command File Mode";
+
+        //Print out an error followed by cin to make sure the message is seen if the file is not valid.
+        if (!file.is_open()){
+            cout << endl << "File " << argv[1] << "is not valid!" << endl;
+            cout << "Press enter to continue..." << endl;
+            string temp;
+            getline(cin,temp);
+            exit(1);
+        }
     }
+
+    cout << endl << endl;
 
     string line, command;
 
@@ -57,15 +67,24 @@ int main(int argc, char* argv[]) {
     signal(SIGINT, [](int signum) -> void { exit(signum); });
     do {
         command = "";
-        if (argc <= 2) {
+        if (argc == 1) {
             cout << "SVDCompression> ";
             //1. Get the entire line of command.
             getline(cin, line);
-        } else {
+        }
+
+        else {
             if (file.is_open()) {
                 getline(file, line);
-            } else {
-                cerr << "file at " << argv[3] << " does not exist!";
+
+                //If there is a '#' or nothing, then skip the line (is a comment).
+                if (line.front() == '#' || line.empty()){
+                    continue;
+                }
+            }
+
+            else {
+                cerr << "file at " << argv[1] << " does not exist!";
                 exit(1);
             }
         }
@@ -252,223 +271,4 @@ string getPrefix(){
         cerr << "The executable's location or shortcut working directory is not correct!" << endl;
         exit(1);
     }
-}
-
-void showImage(const string& fileLocation){
-    //1. Check if the file exists and is a valid image file.
-    if (fs::exists(fileLocation) && AssetManager::validFile(fileLocation)){
-        //2. Alert the user that the image will be displayed and they will be required to close window.
-        cout << "Displaying " << fileLocation << "." << endl << "Close the window to continue..." << endl;
-        //3. Load texture, assign to sprite, and generate scaling factor for sprite.
-        Texture image;
-        image.loadFromFile(fileLocation);
-        Sprite dispImage(image);
-        float scaleX = ((float)sf::VideoMode::getDesktopMode().width / VIDEOMODE_SCALE) / (float)image.getSize().x;
-        float scaleY = ((float)sf::VideoMode::getDesktopMode().height / VIDEOMODE_SCALE) / (float)image.getSize().y;
-
-        Vector2f scales;
-
-        //5. Use the smaller of the two possible scaling factors (in case longer than tall or vice versa).
-        if (scaleX < scaleY){
-            scales.x = scaleX;
-            scales.y = scaleX;
-        }
-
-        else{
-            scales.x = scaleY;
-            scales.y = scaleY;
-        }
-
-        //6. Set scale and display image.
-        dispImage.setScale(scales);
-        sf::RenderWindow window(sf::VideoMode(dispImage.getGlobalBounds().width, dispImage.getGlobalBounds().height),
-                                "Media Compression by iCompression ~ show " + fileLocation, sf::Style::Close);
-
-        if (!AssetManager::isLoaded()){
-            AssetManager("");
-        }
-
-        while(window.isOpen()) {
-            Event event{};
-            while (window.pollEvent(event)) {
-
-                if (event.type == Event::Closed) {
-                    window.close();
-                }
-                window.draw(dispImage);
-                window.display();
-            }
-        }
-    }
-
-    else{
-        cerr << "File " << fileLocation << " does not exist or isn't valid, so the image cannot be displayed." << endl;
-    }
-}
-
-void showImages(){
-
-        if (AssetManager::getFiles().empty()){
-            cerr << "No files were loaded into the program!" << endl;
-            return;
-        }
-
-        //TODO: Remove comment below in final build!
-        /*
-        if (AssetManager::getCompressedFiles().empty()){
-            cerr << "No files were compressed by the program!" << endl;
-            return;
-        }
-        */
-
-        //2. Alert the user that the images will be displayed and they will be required to close window.
-        cout << "Displaying compressed images." << endl << "Close the window to continue..." << endl;
-
-        //3. Create the window and scene manager. Add the scene and change to it.
-        sf::RenderWindow window(sf::VideoMode(0, 0),
-                                "Media Compression by iCompression: Qualitative Comparison", sf::Style::Close);
-        window.setFramerateLimit(60);
-
-        if (!AssetManager::isLoaded()){
-            AssetManager("");
-        }
-
-        SceneManager sceneManager(&window);
-        SceneManager::addScene("Images");
-        SceneManager::changeScene("Images");
-
-        //4. Load all of the images.
-        auto& originalSet = AssetManager::getFiles();
-        //TODO: Replace with compressedFiles once SVD is finished.
-
-        for (auto& file : originalSet){
-            AssetManager::addFile(file, COMPRESSED);
-        }
-
-        auto& compressedSet = AssetManager::getCompressedFiles();
-
-        auto originalImages = originalSet.begin();
-        auto compressedImages = compressedSet.begin();
-
-        for (auto& file : originalSet){
-            if (!AssetManager::textureExists(file)){
-                AssetManager::addImage(AssetManager::getPrefix() + file);
-            }
-        }
-
-        //4. Create the buttons and sprites to be moved later.
-        Scene& scene = SceneManager::getScene("Images");
-        scene.addImage("original", *originalImages, Vector2f(0,0));
-        scene.addImage("compressed", *originalImages, Vector2f(0,0));
-
-        auto& original = scene.getImages("original");
-        auto& compressed = scene.getImages("compressed");
-
-        scene.addButton("forward", "Forward.png", Vector2f(0,0), [&originalImages, &compressedImages, &originalSet,
-                                                                  &compressedSet, &original, &compressed, &window, &scene]()->void {
-            //Check if the iterator will reach the end, and reset to the beginning if true.
-            originalImages++;
-            compressedImages++;
-            if (originalImages == originalSet.end()) {
-                originalImages = originalSet.begin();
-                compressedImages = compressedSet.begin();
-            }
-
-            //Get the next textures.
-            const Texture &originalNext = AssetManager::getTexture(fs::path(*originalImages).filename().string());
-            const Texture &compressedNext = AssetManager::getTexture(fs::path(*compressedImages).filename().string());
-
-            //Set the images textures to the next textures.
-            original->setTexture(originalNext, true);
-            compressed->setTexture(compressedNext, true);
-
-            //Adjust the window to fit the new images.
-            adjustWindow(window, scene.getImages("original"), scene.getImages("compressed"),
-                         scene.getButtons("forward"),
-                         scene.getButtons("reverse"));
-        });
-
-        scene.addButton("reverse", "Reverse.png", Vector2f(0,0), [&originalImages, &compressedImages, &originalSet,
-                                                                  &compressedSet, &original, &compressed, &window, &scene]()->void {
-            //Check if the iterator is at the beginning. If so, wrap around to the end - 1.
-            originalImages--;
-            compressedImages--;
-            if (originalImages == originalSet.begin()) {
-                originalImages = --originalSet.end();
-                compressedImages = --compressedSet.end();
-            }
-
-            //Get the previous textures.
-            const Texture &originalPrev = AssetManager::getTexture(fs::path(*originalImages).filename().string());
-            const Texture &compressedPrev = AssetManager::getTexture(fs::path(*compressedImages).filename().string());
-
-            //Set the images textures to the previous textures.
-            original->setTexture(originalPrev, true);
-            compressed->setTexture(compressedPrev, true);
-
-            //Adjust the window to fit the new images.
-            adjustWindow(window, scene.getImages("original"), scene.getImages("compressed"),
-                         scene.getButtons("forward"),
-                         scene.getButtons("reverse"));
-        });
-
-        auto& forward = scene.getButtons("forward");
-        auto& reverse = scene.getButtons("reverse");
-
-        //Adjust the window first before opening it.
-        adjustWindow(window, original, compressed, forward, reverse);
-
-        while(window.isOpen()) {
-            Event event{};
-            while (window.pollEvent(event)) {
-                if (event.type == Event::Closed) {
-                    window.close();
-                }
-
-                else if (event.type == Event::MouseButtonPressed){
-                    if (event.mouseButton.button == Mouse::Left){
-                        SceneManager::activateElement(Mouse::getPosition(window));
-                    }
-                }
-
-                window.clear(Color::White);
-                SceneManager::drawAll();
-                window.display();
-            }
-        }
-}
-
-void adjustWindow(sf::RenderWindow& window, unique_ptr<Sprite>& original, unique_ptr<Sprite>& compressed,
-                  unique_ptr<Button>& forward, unique_ptr<Button>& reverse){
-    //1. Get the images and their size.
-    sf::Vector2u size2u = original->getTexture()->getSize();
-
-    //2. Generate the scaling factor for the images.
-    float scaleX = ((float)sf::VideoMode::getDesktopMode().width / VIDEOMODE_SCALE) / (float)size2u.x;
-    float scaleY = ((float)sf::VideoMode::getDesktopMode().height / VIDEOMODE_SCALE) / (float)size2u.y;
-
-    //3. Use the smaller of the two.
-    Vector2f scales;
-    scales = (scaleX < scaleY ? Vector2f(scaleX, scaleX) : Vector2f(scaleY, scaleY));
-    original->setScale(scales);
-    compressed->setScale(scales);
-
-    //4. Resize the window to fit both images, buttons, and text with margins.
-    Vector2u buttonSize = forward->getBaseTexture().getSize();
-    unsigned int imageWidth = original->getGlobalBounds().width;
-    unsigned int imageHeight = original->getGlobalBounds().height;
-
-    unsigned int width = (imageWidth * 2) + (3 * IMAGE_MARGIN);
-    unsigned int height = imageHeight + (2 * IMAGE_MARGIN) + buttonSize.x;
-
-    Vector2u newSize(width, height);
-    window.setSize(newSize);
-    window.setView(sf::View(sf::FloatRect(0, 0, window.getSize().x, window.getSize().y)));
-    window.setPosition(sf::Vector2i(0,0));
-
-    //5. Reposition the elements.
-    original->setPosition(Vector2f(IMAGE_MARGIN, IMAGE_MARGIN));
-    compressed->setPosition(Vector2f(((2 * IMAGE_MARGIN) + imageWidth), IMAGE_MARGIN));
-    forward->getSprite().setPosition(Vector2f(IMAGE_MARGIN + buttonSize.x, (2 * IMAGE_MARGIN) + imageHeight));
-    reverse->getSprite().setPosition(Vector2f(IMAGE_MARGIN, (2 * IMAGE_MARGIN) + imageHeight));
 }
