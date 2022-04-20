@@ -77,7 +77,8 @@ void SVDAlgorithm(const string& scriptLocation, const string& size, const string
 
         //4. Create the output fileLocation which includes new image name (C[name].
         string fileName = fs::path(file).filename().string();
-        string imageFileLocation = AssetManager::getOutputFolder() + +"images/C_" + fileName;
+        string imageFileLocation = AssetManager::getOutputFolder() + "images/C_" + fileName;
+        string imageFileLocation2 = AssetManager::getOutputFolder() + "images/C2_" + fileName;
         string csvFileLocation = AssetManager::getOutputFolder() + "csv/" + fileName;
         string binFileLocation = AssetManager::getOutputFolder() + fileName;
         imageFileLocation.replace(imageFileLocation.find_last_of('.'), 4, imageFormat);
@@ -106,12 +107,6 @@ void SVDAlgorithm(const string& scriptLocation, const string& size, const string
 
             //5. Export the image.
             if (!AssetManager::exportImage(AssetManager::csvToImage(csvFileLocation),
-                                           imageFileLocation)) {
-                cerr << endl << "\tCould not export image to " << imageFileLocation << endl;
-            }
-
-            //5. Export the image.
-            if (!AssetManager::exportImage(AssetManager::csvToImage(csvFileLocation + ".test"),
                                            imageFileLocation)) {
                 cerr << endl << "\tCould not export image to " << imageFileLocation << endl;
             }

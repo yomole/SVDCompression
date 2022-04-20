@@ -37,16 +37,27 @@ string getPrefix();
 ///@brief Runs the Huffman Encoding Algorithm.
 void huffmanAlgorithm();
 
+void convertImage(const string& fileLocation, const string& extension);
+
 int main(int argc, char* argv[]) {
 
     cout << "Starting directory is: " << (getPrefix().empty() ? "SVDCompression\\" : "SVDCompression\\bin") << endl;
     sf::RenderWindow window(sf::VideoMode(0, 0),
                             "Media Compression by iCompression: Qualitative Comparison", sf::Style::Close);
     AssetManager(getPrefix().data());
+
+    Image image;
+    image.loadFromFile("input/roman.jpg");
+    image.saveToFile("input/roman.tga");
+
+
     window.close();
 
     //Load the python interpreter to keep it alive for as long as possible.
     scope = new py::scoped_interpreter{};
+
+
+
 
     cout << "Media Compression by iCompression";
 
@@ -170,6 +181,26 @@ int main(int argc, char* argv[]) {
             }
         }
 
+        else if (isCommand(command, args, "decompress")) {
+            if (command == "help" || args.size() != 2) {
+                getHelp(COMPRESS);
+            }
+
+            else if (args.size() == 2) {
+                decompressFile(args.at(0).data(), args.at(1).data());
+            }
+        }
+
+        else if (isCommand(command, args, "convert")) {
+            if (command == "help" || args.size() != 2) {
+                getHelp(COMPRESS);
+            }
+
+            else if (args.size() == 2) {
+                convertImage(args.at(0), args.at(1));
+            }
+        }
+
         else if (isCommand(command, args, "show")) {
             if (command == "help" || args.size() != 1) {
                 getHelp(SHOW);
@@ -287,18 +318,33 @@ void huffmanAlgorithm(){
         return;
     }
 
-    set<char*> modifiedFiles;
+    map<unsigned char, string> data;
+
+    cout << "Running Huffman encoding algorithm on " << AssetManager::getFiles().size() << " files..." << endl;
     for (auto& file : AssetManager::getFiles()){
-        string data = file;
-        modifiedFiles.insert(data.data());
+        cout << "File: " << file << "...";
+
+        string output = AssetManager::getOutputFolder() + "huffman/" + fs::path(file).filename().string();
+        output.replace(output.find_last_of('.'), 4, ".bin");
+        time_t begin, end;
+        time(&begin);
+
+        compressFile(file.data(), output.data(), data);
+
+        time(&end);
+        cout << "Done! (Took " << difftime(end, begin) << " seconds)" << endl;
+        cout << endl << "Data in map: " << endl;
+
+        for (auto & iter : data){
+            cout << "{" << iter.first << "," << iter.second << ")" << endl;
+        }
     }
+}
 
-    cout << "Running Huffman encoding algorithm on " << AssetManager::getFiles().size() << " files...";
-    time_t begin, end;
-    time(&begin);
-
-    compressFile("5", modifiedFiles);
-
-    time(&end);
-    cout << "Done! (Took " << difftime(end, begin) << " seconds)" << endl;
+void convertImage(const string& fileLocation, const string& extension){
+    string newFile = fileLocation;
+    Image image;
+    image.loadFromFile(fileLocation);
+    newFile.replace(newFile.find_last_of('.'), 4, extension);
+    image.saveToFile(newFile);
 }

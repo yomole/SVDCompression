@@ -2,10 +2,6 @@
 # These are comments! Whitespace is also ignored.
 
 # Add all files in input folder and open the image viewer for testing.
-add input/roman.jpg
-compress 120k .png
-compress 110k .png
-compress 100k .png
-compress 90k .png
+decompress output/huffman/beach.bin output/huffman/images/beach.jpg
 # Do not forget "exit" at the end (or else it will go into an infinite loop)!
 exit

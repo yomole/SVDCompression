@@ -203,7 +203,10 @@ void updateText(const string& origFile, const string& compFile, Scene& scene){
     const auto& fnNew = fs::path(origFile).filename().string();
     const auto& fsOrigNew = (float)file_size(fs::path(origFile)) / (float)1024;
     const auto& fsSVDNew = (float)file_size(fs::path(compFile)) / (float)1024;
-    const auto fsHuffmanNew = 321123;
+
+    string huffmanName =  AssetManager::getOutputFolder() + "huffman/" + fs::path(origFile).filename().string();
+    huffmanName.replace(huffmanName.find_last_of('.'), 4, ".bin");
+    const auto fsHuffmanNew = file_size(fs::path(huffmanName)) / (float)1024;
 
     fn->setString("File: " + fnNew);
     fsOrig->setString("Original File Size: " + to_string(fsOrigNew) + " Kb");
