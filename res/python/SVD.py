@@ -121,7 +121,9 @@ def toCSV(matrixList, fileLoc, rows, cols):
     for r in range(rows):
         for c in range(cols):
             for n in range(4):
-                fileLoc.write(str(matrixList[n][r,c]))
+                currVal = round(matrixList[n][r,c])
+                fileLoc.write(str(currVal))
+                fileLoc.write(" ")
     return
 
 """ Start of main method"""
