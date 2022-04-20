@@ -1,8 +1,6 @@
 import numpy as np
 from numpy.linalg import eig
 import struct
-import os
-
 
 class triple:
     def __init__(self, _sigma, _v, _u):
@@ -95,11 +93,11 @@ def reconstruct(listOfTriples, rows, cols):
 #already expects a header to be written
 def writeToFile(listOfTriples, rows, cols, fileWrite):
     for triples in listOfTriples:
-        fileWrite.write(struct.pack('d', triples.sigma))
+        fileWrite.write(struct.pack('f', triples.sigma))
         vList = triples.v.tolist()
         uList = triples.u.tolist()
-        fileWrite.write(struct.pack('%sd' % cols, *vList))
-        fileWrite.write(struct.pack('%sd' % rows, *uList))
+        fileWrite.write(struct.pack('%sf' % cols, *vList))
+        fileWrite.write(struct.pack('%sf' % rows, *uList))
 
 #outputs a list of each of the 4 RGBA matrices
 def readFromFile(fileRead):
@@ -108,10 +106,10 @@ def readFromFile(fileRead):
     for i in range(4):
         currTripleList = []
         for kLoop in range(newK):
-            newSigmaBefore = struct.unpack('d', fileRead.read(8))
+            newSigmaBefore = struct.unpack('f', fileRead.read(4))
             newSigma = sum(newSigmaBefore)
-            newV = struct.unpack('%sd' % newCol, fileRead.read(newCol*8))
-            newU = struct.unpack('%sd' % newRow, fileRead.read(newRow*8))
+            newV = struct.unpack('%sf' % newCol, fileRead.read(newCol*4))
+            newU = struct.unpack('%sf' % newRow, fileRead.read(newRow*4))
             currTripleList.append(triple(newSigma, np.array(newV), np.array(newU)))
         #after we get our triple list, we want to reconstruct, append, then move next
         outList.append(reconstruct(currTripleList, newRow, newCol))
@@ -129,9 +127,7 @@ def toCSV(matrixList, fileLoc, rows, cols):
     return
 
 """ Start of main method"""
-#debugging statement
-#cwd = os.getcwd()
-#print("Current working directory: {0}".format(cwd))
+
 sizeCol = sizeColumn
 print("            Reading character array...")
 bigMatrix = charArrayReader(charArray)
@@ -166,17 +162,5 @@ print("             Writing CSV file...")
 toCSV(matrixList, fileWriteCSV, readRow, readCol)
 fileWriteCSV.close()
 
-"""Control test"""
-"""
-bigMatrixList = []
-for i in range(4):
-    bigMatrixList.append(bigMatrix[:,:,i])
-#should now have list of matrices that were passed in directly from char array
-fileLocationControl = fileLocationCSV + ".test"
-fileWriteControl = open(fileLocationControl, 'w')
-print("             Writing control test csv...")
-toCSV(bigMatrixList, fileWriteControl, sizeRow, sizeCol)
-fileWriteControl.close()
-"""
 
         
