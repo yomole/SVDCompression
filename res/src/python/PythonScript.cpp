@@ -129,8 +129,10 @@ bool runPy(const string& fileLocation, const py::dict& global, const py::dict& l
             eval_file(fileLocation, global, local);
         }
         catch(py::error_already_set& exception){
-            cerr << "Program encountered a Python issue when running " << fileLocation << endl;
+            cerr << endl << "\tProgram encountered a Python issue when running " << fileLocation << endl;
+            exception.what();
             exception.trace();
+            return false;
         }
         return true;
     }
