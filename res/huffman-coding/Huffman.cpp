@@ -1,6 +1,69 @@
 #include "Huffman.h"
 
+//Compresses File using Huffman Coding
+void compressFile(const string &size, set<char*> &files)
+{
+    Huffman huff;
+    int sz = 0;
+    int paddedBits = 0;
+    map<unsigned char, int> freqTable;
+    for (auto& iter : files){
+        //read entire file content in a file and places in buffer to use later
+        unsigned char* buffer = readFileIntoBuffer(iter, sz);
+        for (int i = 0; i < sz; i++)
+        {
+            freqTable[buffer[i]]++;
+        }
+        //Building the Huffman create
+        Tree* root = buildHuffmanTree(convertToVector(freqTable));
+        traverseHuffmanTree(root, "", "", huff.getCode());
+        string outputString = getHuffmanBitstring(buffer, huff.getCode(), sz, paddedBits);
+        sz = outputString.size();
+        vector<unsigned char> outputBufferV;
+        getBufferFromString(outputString, outputBufferV, sz);
+        unsigned char* outputBuffer = outputBufferV.data();
+        //Check output path
+        writeHeader(iter, huff.getCode(), paddedBits);
+        //Writes out compressed file to show size
+        writeFileFromBuffer(iter, outputBuffer, sz, 1);
+    }
+}
 
+//Writes buffer file for an image
+void writeFileFromBuffer(const char* path, unsigned char* buffer, int sz, int flag)
+{
+    FILE* fp;
+    if (flag == 0)
+    {
+        fp = fopen(path, "wb");
+    }
+
+    else {
+        fp = fopen(path, "ab");
+    }
+    //write buffer files
+    fwrite(buffer, 1, sz, fp);
+
+    fclose(fp);
+}
+
+
+void writeHeader(const char* path, map<unsigned char, string> codes, int paddedBits) {
+
+    int size = codes.size();
+    writeFileFromBuffer(path, (unsigned char*)&paddedBits, sizeof(int), 0);
+    writeFileFromBuffer(path, (unsigned char*)&size, sizeof(int), 1);
+    char nullBit = '\0';
+    for (map<unsigned char, string>::iterator i = codes.begin(); i != codes.end(); i++)
+    {
+        writeFileFromBuffer(path, (unsigned char*)&i->first, 1, 1);
+        int len = i->second.size();
+        writeFileFromBuffer(path, (unsigned char*)&len, sizeof(int), 1);
+        writeFileFromBuffer(path, (unsigned char*)i->second.c_str(), i->second.size(), 1);
+    }
+}
+
+//Builds Huffman Tree and sends in a freqTable with values
 Tree* buildHuffmanTree(vector<pair<unsigned char, int> > freqTable)
 {
     priority_queue<Tree*, vector<Tree*>, Huffman> huffQueue;
@@ -29,6 +92,7 @@ Tree* buildHuffmanTree(vector<pair<unsigned char, int> > freqTable)
     return huffQueue.top();
 }
 
+//Converts char to binary
 string toBinary(unsigned  char a){
     string output = "";
     while (a != 0)
@@ -52,7 +116,7 @@ string toBinary(unsigned  char a){
 
 }
 
-void traverseHuffmanTree(Tree* root, string prev, string toAppend, map<unsigned char, string>& codemap)
+void traverseHuffmanTree(Tree* root, string prev, string toAppend, map<unsigned char, string> codemap)
 {
 
     prev += toAppend;
@@ -164,26 +228,38 @@ unsigned char* getDecodedBuffer(string bitstring, vector<unsigned char>& buffer,
     return buffer.data();
 }
 
-void compressFile(const char* path,const char* output_path, map<unsigned char, string>& codes)
+unsigned char* readHeader(unsigned char* buffer, map<unsigned char, string>& codes, int& paddedBits, int& sz)
 {
-    int sz = 0;
-    int paddedBits = 0;
-    map<unsigned char, int> freqtable;
-    unsigned char* buffer = readFileIntoBuffer(path, sz);
-    for (int i = 0; i < sz; i++)
+    paddedBits = *((int*)buffer);
+    //cout << paddedBits << "PADDED" << endl;
+    buffer = buffer + 4;
+    sz -= 4;
+    int size = *((int*)buffer);
+    buffer = buffer + 4;
+    sz -= 4;
+    for (int i = 0; i < size; i++)
     {
-        freqtable[buffer[i]]++;
+        unsigned char key = buffer[0];
+        buffer++;
+        sz--;
+        int len = *((int*)buffer);
+        buffer += 4;
+        sz -= 4;
+        char* value = (char*)malloc(len + 1);
+
+        for (int j = 0; j < len; j++)
+        {
+            value[j] = buffer[j];
+        }
+        buffer += len;
+        sz -= len;
+        value[len] = '\0';
+        codes[key] = value;
     }
-    Tree* root = buildHuffmanTree(convertToVector(freqtable));
-    traverseHuffmanTree(root, "", "", codes);
-    string outputString = getHuffmanBitstring(buffer, codes, sz, paddedBits);
-    sz = outputString.size();
-    vector<unsigned char> outputBufferV;
-    getBufferFromString(outputString, outputBufferV, sz);
-    unsigned char* outputBuffer = outputBufferV.data();
-    writeHeader(output_path, codes, paddedBits);
-    writeFileFromBuffer(output_path, outputBuffer, sz, 1);
+
+    return buffer;
 }
+
 
 void decompressFile(const char* inputPath, const char* outputPath)
 {
@@ -200,6 +276,7 @@ void decompressFile(const char* inputPath, const char* outputPath)
     writeFileFromBuffer(outputPath, outputBuffer, sz, 0);
 }
 
+//Compares both files compressed and uncompressed (the difference should be 0 since there is nothing lost during compression )
 int CompareFiles(const char* pFname1,const char* pFname2)
 {
     FILE* pFile1, * pFile2;
@@ -207,8 +284,8 @@ int CompareFiles(const char* pFname1,const char* pFname2)
     int       i = 0;
     char      tmp1, tmp2;
 
-    fopen_s (&pFile1,pFname1, "r");
-    fopen_s (&pFile2,pFname2, "r");
+    pFile1 = fopen(pFname1, "r");
+    pFile2 = fopen(pFname2, "r");
 
     fseek(pFile1, 0, SEEK_END);
     lSize1 = ftell(pFile1);
@@ -231,4 +308,22 @@ int CompareFiles(const char* pFname1,const char* pFname2)
         }
     }
     return 0;
+}
+
+unsigned char* readFileIntoBuffer(const char* path, int& sz)
+{
+    //May change to r
+    FILE* fp = fopen(path, "rb");
+    if (fp == NULL)
+    {
+        cout << "File not found!" << endl;
+        exit(-1);
+    }
+    sz = 0;
+    fseek(fp, 0, SEEK_END);
+    sz = ftell(fp);
+    fseek(fp, 0, SEEK_SET);
+    unsigned char* buffer = (unsigned char*)malloc(sz);
+    fread(buffer, 1, sz, fp);
+    return buffer;
 }
