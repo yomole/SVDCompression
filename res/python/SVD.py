@@ -130,12 +130,13 @@ def toCSV(matrixList, fileLoc, rows, cols):
     return
 
 """ Start of main method"""
-print("             Reading character array...")
+print("            Reading character array...")
 bigMatrix = charArrayReader(charArray)
 SVDList = [] #List of SVD objects
-print("             Compressing...")
 for i in range(4):
+    print("             Compressing...")
     SVDList.append(SVD(bigMatrix[:,:,i]))
+
 writeRow = SVDList[0].m
 writeCol = SVDList[0].n
 k = getK(writeRow, writeCol, fileLim)
