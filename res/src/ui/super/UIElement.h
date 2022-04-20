@@ -20,7 +20,7 @@ class UIElement {
 
 protected:
     string name; ///<Name of the UI Element.
-    function<void(vector<string>&)> function; ///< Function embedded in the UI element.
+    function<void(vector<string>&)> UIfunction; ///< Function embedded in the UI element.
     vector<string> arguments;
 public:
     /// Default Constructor. Creates the UI element with the specified name and embedded function.

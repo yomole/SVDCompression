@@ -42,6 +42,7 @@ void Scene::deserialize(const string &fileLocation){
 
             else if (element == "text"){
                 addText(parse);
+                //Test2
             }
 
             else if(element == "image"){

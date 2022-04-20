@@ -13,11 +13,11 @@ AssetManager::AssetManager(const string& prefix){
     fontFolder = prefix + "res/fonts/";
 
     //2. Attempt to load the missing texture.
-    if (!addTexture(MISSING_TEXTURE.data())){
+    if (!AssetManager::addTexture(MISSING_TEXTURE.data())){
         throw std::invalid_argument("[Asset Manager] FATAL! Missing texture was not found! Stopping program...");
     }
 
-    if (!addFont(DEFAULT_FONT.data())){
+    if (!AssetManager::addFont(DEFAULT_FONT.data())){
         throw std::invalid_argument("[Asset Manager] FATAL! Default font was not found! Stopping program...");
     }
 
@@ -112,7 +112,7 @@ bool AssetManager::addFont(const string &fontName){
 
     //2. Create a new texture and load it from the specified file.
     Font newFont;
-    if (!newFont.loadFromFile(fontFolder + fontName)){
+    if (!newFont.loadFromFile(AssetManager::fontFolder + fontName)){
         return false;
     }
 
@@ -245,7 +245,7 @@ bool AssetManager::validFile(const string& filePath){
 }
 
 set<string>& AssetManager::getFiles(){
-    return files;
+    return AssetManager::files;
 }
 
 void AssetManager::listFiles(){

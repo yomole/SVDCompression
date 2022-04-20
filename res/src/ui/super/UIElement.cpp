@@ -3,7 +3,7 @@
 UIElement::UIElement(const string& name, vector<string>& arguments,
                      const std::function<void(vector<string>&)>& function){
     this->name = name;
-    this->function = function;
+    this->UIfunction = function;
     this->arguments = arguments;
 }
 
@@ -12,5 +12,5 @@ const string& UIElement::getName() const{
 }
 
 void UIElement::callFunction(){
-    function(arguments);
+    UIfunction(arguments);
 }
