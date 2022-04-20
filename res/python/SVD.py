@@ -3,14 +3,6 @@ from numpy.linalg import eig
 import struct
 import os
 
-"""NEED TO REMOVE"""
-#sizeRow = 2
-#sizeColumn = 2
-#fileLim = 10000
-#charArray = [2,3,4,255,2,3,4,255,2,3,4,255,2,3,4,255]
-#fileLocation = "Something"
-#fileName = "SomethingElse"
-"""NEED TO REMOVE"""
 
 class triple:
     def __init__(self, _sigma, _v, _u):
@@ -134,7 +126,7 @@ def toCSV(matrixList, fileLoc, rows, cols):
 
 """ Start of main method"""
 #debugging statement
-cwd = os.getcwd()
+#cwd = os.getcwd()
 print("Current working directory: {0}".format(cwd))
 sizeCol = sizeColumn
 print("            Reading character array...")
