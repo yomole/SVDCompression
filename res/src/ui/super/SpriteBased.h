@@ -19,18 +19,16 @@ protected:
 public:
 
     /// @brief Default Constructor. Creates the Sprite-based UI element.
-    /// @param name name of the UI element.
-    /// @param baseTexture the default texture of the UI element.
-    /// @param location the default location of the UI element.
-    /// @param function the embedded function of the  UI element.
+    /// @param name Name of the UI element.
+    /// @param baseTexture The default texture of the UI element.
+    /// @param location The default location of the UI element.
+    /// @param function The embedded function of the  UI element.
     SpriteBased(const string& name, const Texture& baseTexture, const Vector2f& location,
                 const std::function<void()> &function);
 
-    /// @brief base texture accessor.
-    /// @returns the base texture of the UI element.
+    /// @returns The base texture of the UI element.
     const Texture& getBaseTexture() const;
 
-    /// @brief sprite accessor.
-    /// @returns the sprite of the UI element.
+    /// @returns A reference to the sprite of the UI element.
     Sprite& getSprite();
 };

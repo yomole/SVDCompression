@@ -10,7 +10,6 @@
 #include "../Button.h"
 #include "../ProgressBar.h"
 #include "../Checkbox.h"
-#include "../functions/ButtonFunctions.h"
 #include "../../managers/AssetManager.h"
 
 using std::unordered_map;
@@ -32,6 +31,7 @@ using sf::Texture;
 using sf::Color;
 using sf::Vector2f;
 
+/// A grouping of UI elements that are drawn together by the scene manager.
 class Scene {
         unordered_map<string, unique_ptr<Button>> buttons;
         unordered_map<string, unique_ptr<Checkbox>> checkboxes;
@@ -60,16 +60,21 @@ public:
      * MAP ACCESSORS *
      * * * * * * * * */
 
+    ///@returns All button objects in the scene in the form of a map reference.
     unordered_map<string, unique_ptr<Button>> &getButtons();
 
     ///@deprecated
+    ///@returns All progress bar objects in the scene in the form of a map reference.
     unordered_map<string, unique_ptr<ProgressBar>> &getProgressBars();
 
+    ///@returns All text objects in the scene in the form of a map reference.
     unordered_map<string, unique_ptr<Text>> &getTexts();
 
+    ///@returns All image objects in the scene in the form of a map reference.
     unordered_map<string, unique_ptr<Sprite>> &getImages();
 
     ///@deprecated
+    ///@returns All checkbox objects in the scene in the form of a map reference.
     unordered_map<string, unique_ptr<Checkbox>> &getCheckboxes();
 
     /* * * * * * * * * * *
@@ -79,20 +84,28 @@ public:
     unique_ptr<Button> &getButtons(const string &elementName);
 
     ///@deprecated
+    ///@returns A progress bar in the scene with a given name.
+    ///@warning If the progress bar does not exist, a null pointer is returned!
     unique_ptr<ProgressBar> &getProgressBars(const string &elementName);
 
+    ///@returns A text object in the scene with a given name.
+    ///@warning If the progress bar does not exist, a null pointer is returned!
     unique_ptr<Text> &getTexts(const string &elementName);
 
+    ///@returns An image object in the scene with a given name.
+    ///@warning If the progress bar does not exist, a null pointer is returned!
     unique_ptr<Sprite> &getImages(const string &elementName);
 
     ///@deprecated
+    ///@returns A checkbox object in the scene with a given name.
+    ///@warning If the progress bar does not exist, a null pointer is returned!
     unique_ptr<Checkbox> &getCheckboxes(const string &elementName);
 
     /* * * * * * * * * * * * * * * * *
      * SERIALIZE & PARSING FUNCTIONS *
      * * * * * * * * * * * * * * * * */
 
-    //Parses the arguments of a UI element.
     ///@deprecated
+    ///Parses the arguments of a UI element from a scene file.
     void parseArgs(istringstream& parse, vector<string>& args);
 };
