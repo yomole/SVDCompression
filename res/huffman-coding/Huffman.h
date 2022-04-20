@@ -38,7 +38,7 @@ string getHuffmanBitstring(unsigned char* buffer, map<unsigned char, string> cod
 unsigned char* getBufferFromString(string bitstring, vector<unsigned char>& outputBuffer, int& sz);
 string getStringFromBuffer(unsigned char* buffer, int sz);
 unsigned char* getDecodedBuffer(string bitstring, vector<unsigned char>& buffer, map<unsigned char, string> codes, int& sz, int paddedBits);
-void compressFile(const string &size, set<const char*> &files);
+void compressFile(const char* path,const char* output_path, map<unsigned char, string>& codes);
 void decompressFile(const char* inputPath, const char* outputPath);
 int CompareFiles(const char* pFname1,const char* pFname2);
 unsigned char* readFileIntoBuffer(const char* path, int& sz);
