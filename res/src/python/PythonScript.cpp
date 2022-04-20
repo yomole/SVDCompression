@@ -110,6 +110,12 @@ void SVDAlgorithm(const string& scriptLocation, const string& size, const string
                 cerr << endl << "\tCould not export image to " << imageFileLocation << endl;
             }
 
+            //5. Export the image.
+            if (!AssetManager::exportImage(AssetManager::csvToImage(csvFileLocation + ".test"),
+                                           imageFileLocation)) {
+                cerr << endl << "\tCould not export image to " << imageFileLocation << endl;
+            }
+
             //6. Add the new image to the Asset Manager.
             if (!AssetManager::addFile(imageFileLocation, COMPRESSED)) {
                 cerr << endl << "Could not add the processed file to the Asset Manager! You will not be able to "
