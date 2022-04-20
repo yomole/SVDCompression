@@ -50,6 +50,7 @@ class SVD:
         #now we have all of our singular values
         #depending on how we want to store them, we can do a variety of different things
         """ Sorting goes here"""
+        print("     sorting...")
         self.tripleList.sort(key= lambda x: x.sigma, reverse=True)
         
     def getKthApprox(self, k):
