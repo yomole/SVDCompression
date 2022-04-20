@@ -133,9 +133,12 @@ def toCSV(matrixList, fileLoc, rows, cols):
 print("             Reading character array...")
 bigMatrix = charArrayReader(charArray)
 SVDList = [] #List of SVD objects
+print("             Compressing...")
 for i in range(4):
     SVDList.append(SVD(bigMatrix[:,:,i]))
-k = getK(fileLim)
+writeRow = SVDList[0].m
+writeCol = SVDList[0].n
+k = getK(writeRow, writeCol, fileLim)
 #Now for each SVD in the list, we want to get its kth approx and then write it
 fileWrite = open(fileLocationBin, "wb")
 headerInfo = [k, sizeRow, sizeCol]
