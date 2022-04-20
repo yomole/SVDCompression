@@ -4,190 +4,207 @@
 #include <sstream>
 #include <vector>
 #include <fstream>
+#include <csignal>
 #include "managers/AssetManager.h"
-#include "managers/SceneManager.h"
 #include "commands/Commands.h"
 #include "python/PythonScript.h"
+#include "ui/viewer/ImageViewer.h"
 
 using sf::Event;
 using sf::Mouse;
 using std::cin;
 using std::cout;
 using std::string;
-using std::rand;
 using std::getline;
 using std::istringstream;
 using std::vector;
 using std::ifstream;
 
 //FUNCTION PROTOTYPES:
+///@brief Checks if a command is valid and is pointing to a target command.
 bool isCommand(const string& command, const vector<string>& args, const string& target);
+
+///@brief Parses a line into arguments. Arguments with quotes are read until the ending quote.
 void parseArgs(istringstream& parse, vector<string>& args);
+
+///@brief Prints the info contained in the README.md file.
 void printAbout();
 
+///@brief Checks the working directory and gets the prefix which ensures we are running in SVDCompression/
+string getPrefix();
+
 int main(int argc, char* argv[]) {
+
+    cout << "Starting directory is: " << (getPrefix().empty() ? "SVDCompression\\" : "SVDCompression\\bin") << endl;
+    AssetManager::setPrefix(getPrefix().data());
 
     //Load the python interpreter to keep it alive for as long as possible.
     scope = new py::scoped_interpreter{};
 
-    //Testing...
-    if (argc > 1 && string(argv[1]) == "-test") {
+    cout << "Media Compression by iCompression";
 
-        sf::RenderWindow window(sf::VideoMode(1200, 800), "Media Compression by iCompression ~ TESTING MODE");
-        window.setFramerateLimit(60); //Set the fps limit to 60 fps.
-        //TODO: Make prefix work in final build.
-        AssetManager("../"); //Set the prefix for the asset manager (CLion's default).
-        AssetManager::loadAll();
+    //Load the command file, if the argument is there.
+    ifstream file;
+    if (argc == 2) {
+        file.open(argv[1]);
+        cout << ": Command File Mode";
 
-        AssetManager::addFolder("../input");
-
-        SceneManager viewManager(&window);
-        SceneManager::addView("test", "../res/scenes/test.txt");
-        SceneManager::addView("test2", "../res/scenes/test2.txt");
-
-        SceneManager::changeView("test");
-
-        while (window.isOpen()) {
-            sf::Event event{};
-            while (window.pollEvent(event)) {
-                switch (event.type) {
-                    case (Event::Closed): {
-                        window.close();
-                        break;
-                    }
-
-                    case (Event::MouseButtonPressed): {
-                        if (event.mouseButton.button == Mouse::Left) {
-                            SceneManager::activateElement(Mouse::getPosition(window));
-                        }
-                        break;
-                    }
-                }
-            }
-            SceneManager::getView("test").getTexts("mxv")->setString(std::to_string(Mouse::getPosition(window).x));
-            SceneManager::getView("test").getTexts("myv")->setString(std::to_string(Mouse::getPosition(window).y));
-            window.clear(sf::Color::White);
-            SceneManager::drawAll();
-            window.display();
+        //Print out an error followed by cin to make sure the message is seen if the file is not valid.
+        if (!file.is_open()){
+            cout << endl << "File " << argv[1] << "is not valid!" << endl;
+            cout << "Press enter to continue..." << endl;
+            string temp;
+            getline(cin,temp);
+            exit(1);
         }
-        return 0;
     }
 
-    //CLI Mode (Prioritize first for basic testing).
-    else if (argc > 1 || string(argv[1]) == "-cli"){
-        cout << "Media Compression by iCompression: CLI Mode" << endl;
-        ifstream file;
+    cout << endl << endl;
 
-        if (argc > 2 && string(argv[2]) == "-file"){
-            file.open(argv[3]);
+    string line, command;
+
+    //Modified https://www.tutorialspoint.com/how-do-i-catch-a-ctrlplusc-event-in-cplusplus
+    signal(SIGINT, [](int signum) -> void { exit(signum); });
+    do {
+        command = "";
+        if (argc == 1) {
+            cout << "SVDCompression> ";
+            //1. Get the entire line of command.
+            getline(cin, line);
         }
 
-        string line, command;
-        do{
-            command = "";
-            if (argc <= 2) {
-                cout << "SVDCompression> ";
-                //1. Get the entire line of command.
-                getline(cin, line);
+        else {
+            if (file.is_open()) {
+                getline(file, line);
+
+                //If there is a '#' or nothing, then skip the line (is a comment).
+                if (line.front() == '#' || line.empty()){
+                    continue;
+                }
+            }
+
+            else {
+                cerr << "file at " << argv[1] << " does not exist!";
+                exit(1);
+            }
+        }
+
+        //2. Parse it into command parts.
+        istringstream parse(line);
+        vector<string> args;
+        parse >> command;
+        parseArgs(parse, args);
+
+        cout << endl;
+
+        //3. Run the appropriate command.
+        if (isCommand(command, args, "add")) {
+            if (command == "help" || args.size() != 1) {
+                getHelp(ADD);
+            }
+
+            else if (args.size() == 1) {
+                AssetManager::addFile(args.at(0));
+            }
+        }
+
+        else if (isCommand(command, args, "addf")) {
+            if (command == "help" || args.size() != 1) {
+                getHelp(ADDF);
+            }
+
+            else if (args.size() == 1) {
+                AssetManager::addFolder(args.at(0));
+            }
+        }
+
+        else if (isCommand(command, args, "rm")) {
+            if (command == "help" || args.size() != 1) {
+                getHelp(RM);
+            }
+
+            else if (args.size() == 1) {
+                AssetManager::delFile(args.at(0));
+            }
+        }
+
+        else if (isCommand(command, args, "rmf")) {
+            if (command == "help" || args.size() != 1) {
+                getHelp(RMF);
+            }
+
+            else if (args.size() == 1) {
+                AssetManager::delFolder(args.at(0));
+            }
+        }
+
+        else if (isCommand(command, args, "ls")) {
+            if (command == "help" || args.size() > 1) {
+                getHelp(LS);
+            }
+
+            else if (args.size() == 1 && args.at(0) == "-c"){
+                AssetManager::listFiles(COMPRESSED);
+            }
+
+            else{
+                AssetManager::listFiles();
+            }
+        }
+
+        else if (isCommand(command, args, "compress")) {
+            if (command == "help" || args.size() != 2) {
+                getHelp(COMPRESS);
+            }
+
+            else if (args.size() == 2) {
+                SVDAlgorithm(AssetManager::getPrefix() + "res/python/SVD.py", args.at(0), args.at(1));
+            }
+        }
+
+        else if (isCommand(command, args, "show")) {
+            if (command == "help" || args.size() != 1) {
+                getHelp(SHOW);
+            }
+
+            else if (args.size() == 1 && args.at(0) != "all") {
+                showImage(args.at(0));
+            }
+
+            else{
+                showImages();
+            }
+        }
+
+        else if (isCommand(command, args, "about")) {
+            if (command == "help") {
+                getHelp(ABOUT);
+            }
+
+            else {
+                printAbout();
+            }
+        }
+
+        else if (isCommand(command, args, "help")) {
+            if (args.size() == 1 && args.at(0) == "all"){
+                listCommands();
             }
             else{
-                if (file.is_open()){
-                    getline(file, line);
-                }
-                else{
-                    cerr << "file at " << argv[3] << " does not exist!";
-                    exit(1);
-                }
-            }
-
-            //2. Parse it into command parts.
-            istringstream parse(line);
-            vector<string> args;
-            parse >> command;
-            parseArgs(parse, args);
-
-            //3. Run the appropriate command.
-            if (isCommand(command, args, "add")){
-                if (command == "help"){
-                    getHelp(ADD);
-                }
-                else if (args.size() == 1){
-                    AssetManager::addFile(args.at(0));
-                }
-            }
-
-            else if (isCommand(command, args, "addf")){
-                if (command == "help"){
-                    getHelp(ADDF);
-                }
-                else if (args.size() == 1){
-                    AssetManager::addFolder(args.at(0));
-                }
-            }
-
-            else if (isCommand(command, args, "rm")){
-                if (command == "help"){
-                    getHelp(RM);
-                }
-                else if (args.size() == 1){
-                    AssetManager::delFile(args.at(0));
-                }
-            }
-
-            else if (isCommand(command, args, "rmf")){
-                if (command == "help"){
-                    getHelp(RMF);
-                }
-                else if (args.size() == 1){
-                    AssetManager::delFolder(args.at(0));
-                }
-            }
-
-            else if (isCommand(command, args, "ls")){
-                if (command == "help"){
-                    getHelp(LS);
-                }
-                else{
-                    AssetManager::listFiles();
-                }
-            }
-
-            else if (isCommand(command, args, "compress")){
-                if (command == "help"){
-                    getHelp(COMPRESS);
-                }
-                else if (args.size() == 1){
-                    SVDAlgorithm(args.at(0), AssetManager::getFiles());
-                }
-            }
-
-            else if (isCommand(command, args, "about")){
-                if (command == "help"){
-                    getHelp(ABOUT);
-                }
-                else{
-                    printAbout();
-                }
-            }
-
-            else if (isCommand(command, args, "help")){
                 getHelp(HELP);
             }
+        }
 
-            //Display all commands that are available along with their breakdown.
-            else{
-                if (command != "exit"){
-                    listCommands();
-                }
+        //Display a message indicating that there was a bad command.
+        else {
+            if (command != "exit") {
+                cout << "Invalid Command! Use \"help [command]\" or \"help [all]\" for help with commands." << endl;
             }
+        }
 
-        } while (command != "exit");
-    }
+        cout << endl;
 
-    //The SFML Application.
-    else{
-
-    }
+    } while (command != "exit");
 
     //Close the python interpreter.
     delete scope;
@@ -195,6 +212,7 @@ int main(int argc, char* argv[]) {
 }
 
 bool isCommand(const string& command, const vector<string>& args, const string& target){
+    //1. Check that the command is correct and that
     return ((command == target) || (!args.empty() && args.at(0) == target));
 }
 
@@ -223,6 +241,7 @@ void parseArgs(istringstream& parse, vector<string>& args){
 }
 
 void printAbout(){
+    //1. Get the readme file and pipe to CLI output line by line.
     ifstream file("README.md");
 
     if (file.is_open()){
@@ -233,5 +252,23 @@ void printAbout(){
     }
     else{
         cerr << "Unable to display information about the program. For information, please go to the github repository.";
+    }
+}
+
+string getPrefix(){
+    //1. Determine the current filepath. If bin, prefix is ../. If it is SVDCompression, it is nothing. Else, error.
+    string currDir = fs::current_path().filename().string();
+
+    if (currDir == "bin"){
+        return "../";
+    }
+
+    else if (currDir == "SVDCompression"){
+        return "";
+    }
+
+    else{
+        cerr << "The executable's location or shortcut working directory is not correct!" << endl;
+        exit(1);
     }
 }

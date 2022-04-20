@@ -1,3 +1,0 @@
-addf "../input"
-ls
-compress 50

@@ -5,67 +5,152 @@ void VOID::operator()(const vector<string> &nameAndArgs){
 }
 
 void ChangeScene::operator()(const vector<string>& nameAndArgs){
-    SceneManager::changeView(nameAndArgs.at(1));
+    try {
+        SceneManager::changeScene(nameAndArgs.at(1));
+    }
+    catch(out_of_range& outOfRange){
+        cerr << "No scene argument for function ChangeScene!" << endl;
+        return;
+    }
 }
 
 void ChangeImage::operator()(const vector<string> &nameAndArgs){
+    try {
+        string viewName = nameAndArgs.at(1);
+        string imageName = nameAndArgs.at(2);
+        string newImageName = nameAndArgs.at(3);
+    }
+    catch(out_of_range& outOfRange){
+        cerr << "One or more arguments do not exist for function ChangeImage!" << endl;
+    }
+
     if (!AssetManager::textureExists(nameAndArgs.at(4))){
         if (!(AssetManager::addImage(nameAndArgs.at(4)))){
             return;
         }
     }
 
-    SceneManager::getView(nameAndArgs.at(1)).getImages(nameAndArgs.at(2))->setTexture(AssetManager::getTexture(nameAndArgs.at(3)), true);
+    SceneManager::getScene(nameAndArgs.at(1)).getImages(nameAndArgs.at(2))->setTexture(AssetManager::getTexture(nameAndArgs.at(3)), true);
 }
 
-void CycleImages::operator()(vector<string>& nameAndArgs){
+void CycleImagesFwd::operator()(vector<string>& nameAndArgs){
+    const unsigned int firstImage = 5;
     string sceneName = nameAndArgs.at(1);
     string imageName = nameAndArgs.at(2);
-    unsigned int curr;
+    string linkedButton = nameAndArgs.at(3);
+    string currString = nameAndArgs.at(4);
+
+    unsigned int curr,currImage;
     try {
-        curr = stoi(nameAndArgs.at(3));
+        curr = stoi(currString) + 1;
+        currImage = curr + firstImage;
     }
 
     catch(invalid_argument& invalidArgument){
-        cerr << "Argument for starting image is not in a valid format!" << endl;
+        cerr << "Argument for starting image is not in a valid format! Currently: " << currString << endl;
     }
 
     catch(out_of_range& outOfRange){
-        cerr << "Argument for starting image is too big!" << endl;
+        cerr << "Argument for starting image is too big! Currently: " << currString << endl;
     }
 
-    if (curr + 5 >= nameAndArgs.size()){
+    if (currImage >= nameAndArgs.size()){
         curr = 0;
+        currImage = curr + firstImage;
     }
 
-    if (curr + 5 < nameAndArgs.size()){
-        cout << SceneManager::getView(sceneName).getImages(imageName)->getPosition().x << " ";
-        cout << SceneManager::getView(sceneName).getImages(imageName)->getPosition().y << endl;
-        if (!AssetManager::textureExists(nameAndArgs.at(curr + 5 + 1))){
-            if (!(AssetManager::addImage(nameAndArgs.at(curr + 5)))){
-                return;
-            }
+    SceneManager::getScene(sceneName).getTexts("count")->setString("Current: " + to_string(curr));
+
+    string fileLocation = nameAndArgs.at(currImage);
+    string fileName = fs::path(fileLocation).filename().string();
+
+    if (!AssetManager::textureExists(fileName)) {
+        if (!(AssetManager::addImage(fileLocation))) {
+            return;
         }
-        SceneManager::getView(sceneName).getImages(imageName)->setTexture(AssetManager::getTexture(nameAndArgs.at(curr + 5 + 1)), true);
-        curr+=2;
     }
+    SceneManager::getScene(sceneName).getImages(imageName)->setTexture(
+                AssetManager::getTexture(fileName), true);
 
     string currentValue = to_string(curr);
-    nameAndArgs.at(3) = currentValue;
+    nameAndArgs.at(4) = currentValue;
+    SceneManager::getScene(sceneName).getButtons(linkedButton)->getArguments().at(4) = currentValue;
+}
 
+void CycleImagesRev::operator()(vector<string> &nameAndArgs){
+    const unsigned int firstImage = 5;
+    string sceneName = nameAndArgs.at(1);
+    string imageName = nameAndArgs.at(2);
+    string linkedButton = nameAndArgs.at(3);
+    string currString = nameAndArgs.at(4);
+
+    unsigned int curr,currImage;
+    try {
+        curr = stoi(currString) - 1;
+        currImage = curr + firstImage;
+    }
+
+    catch(invalid_argument& invalidArgument){
+        cerr << "Argument for starting image is not in a valid format! Currently: " << currString << endl;
+    }
+
+    catch(out_of_range& outOfRange){
+        cerr << "Argument for starting image is too big! Currently: " << currString << endl;
+    }
+
+    if (currImage < firstImage){
+        curr = nameAndArgs.size() - 1 - firstImage;
+        currImage = curr + firstImage;
+    }
+
+    SceneManager::getScene(sceneName).getTexts("count")->setString("Current: " + to_string(curr));
+
+    string fileLocation = nameAndArgs.at(currImage);
+    string fileName = fs::path(fileLocation).filename().string();
+
+    if (!AssetManager::textureExists(fileName)) {
+        if (!(AssetManager::addImage(fileLocation))) {
+            return;
+        }
+    }
+    SceneManager::getScene(sceneName).getImages(imageName)->setTexture(
+            AssetManager::getTexture(fileName), true);
+
+    string currentValue = to_string(curr);
+    nameAndArgs.at(4) = currentValue;
+    SceneManager::getScene(sceneName).getButtons(linkedButton)->getArguments().at(4) = currentValue;
+}
+
+void Compress::operator()(vector<string> &nameAndArgs) {
+    string sizeString;
+    try{
+        sizeString = nameAndArgs.at(1);
+    }
+    catch(out_of_range& outOfRange){
+        cerr << "No size argument for function Compress!" << endl;
+        return;
+    }
+
+    SVDAlgorithm(sizeString, AssetManager::getFiles(), AssetManager::getPrefix() + "res/python/SVD.py");
 }
 
 function<void(vector<string>&)> getFunction(vector<string>& nameAndArgs){
-    if(nameAndArgs.at(0) == "ChangeScene"){
+    string functionName = nameAndArgs.at(0);
+
+    if(functionName == "ChangeScene"){
         return function<void(const vector<string>&)>(ChangeScene{});
     }
 
-    else if (nameAndArgs.at(0) == "ChangeImage"){
+    else if (functionName == "ChangeImage"){
         return function<void(const vector<string>&)>(ChangeImage{});
     }
 
-    else if (nameAndArgs.at(0) == "CycleImages"){
-        return function<void(vector<string>&)>(CycleImages{});
+    else if (functionName == "CycleImagesFwd"){
+        return function<void(vector<string>&)>(CycleImagesFwd{});
+    }
+
+    else if (functionName == "CycleImagesRev"){
+        return function<void(vector<string>&)>(CycleImagesRev{});
     }
 
     else{

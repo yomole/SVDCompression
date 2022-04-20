@@ -24,7 +24,7 @@ public:
     /// @param location the default location of the UI element.
     /// @param function the embedded function of the  UI element.
     SpriteBased(const string& name, const Texture& baseTexture, const Vector2f& location,
-                const std::function<void(vector<string>&)>& function, vector<string>& arguments);
+                const std::function<void()> &function);
 
     /// @brief base texture accessor.
     /// @returns the base texture of the UI element.

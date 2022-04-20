@@ -14,3 +14,6 @@ On some internet platforms and messaging services, there are limits to the size 
 - https://pybind11.readthedocs.io/en/stable/advanced/cast/overview.html
 - https://github.com/aoloe/cpp-pybind11-playground/tree/master/eval-file
 - https://github.com/numpy/numpy/issues/8097
+
+### In Capturing Ctrl+C
+- https://www.tutorialspoint.com/how-do-i-catch-a-ctrlplusc-event-in-cplusplus

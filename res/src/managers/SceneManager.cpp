@@ -15,9 +15,9 @@ SceneManager::SceneManager(RenderWindow* window){
     SceneManager::currentView = nullptr;
 }
 
-bool SceneManager::addView(const string &viewName, const string &viewFile){
-    if (scenes.count(viewName) == 0) {
-        scenes.insert(pair<string, Scene>(viewName, Scene(viewFile)));
+bool SceneManager::addScene(const string &sceneName){
+    if (scenes.count(sceneName) == 0) {
+        scenes.insert(pair<string, Scene>(sceneName, Scene()));
         return true;
     }
     else{
@@ -25,9 +25,9 @@ bool SceneManager::addView(const string &viewName, const string &viewFile){
     }
 }
 
-bool SceneManager::changeView(const string &viewName){
-    if (scenes.count(viewName) != 0){
-        currentView = &(scenes.at(viewName));
+bool SceneManager::changeScene(const string &sceneName){
+    if (scenes.count(sceneName) != 0){
+        currentView = &(scenes.at(sceneName));
         return true;
     }
     else{
@@ -35,12 +35,12 @@ bool SceneManager::changeView(const string &viewName){
     }
 }
 
-Scene& SceneManager::getView(const string &viewName){
-    if (scenes.count(viewName) != 0){
-        return scenes.at(viewName);
+Scene& SceneManager::getScene(const string &sceneName){
+    if (scenes.count(sceneName) != 0){
+        return scenes.at(sceneName);
     }
     else{
-        cerr << "Scene " << viewName << " does not exist! Returning current scene...";
+        cerr << "Scene " << sceneName << " does not exist! Returning current scene...";
         return *currentView;
     }
 }

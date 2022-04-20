@@ -76,26 +76,6 @@ def breakLine(inputString):
 def getK(row, col, size):
     return (size - 12) // (16*(1+row+col))
 
-"""
-class fileReader:
-    def __init__(self, file):
-        file_obj = open(file, "r")
-        header = file_obj.readline()
-        headerList = breakLine(header)
-        rows = int(headerList[0])
-        columns = int(headerList[1])
-        #now start the main loop
-        multiMatrix = np.zeros((rows, columns, 4))
-        nextLine = ""
-        nextList = []
-        for n in range(4):
-            for i in range(rows):
-                nextLine = file_obj.readline()
-                nextList = breakLine(nextLine)
-                for j in range(columns):
-                    multiMatrix[i,j,n] = 
-"""
-
 def charArrayReader(charList):
     multiMatrix = np.zeros((sizeRow, sizeColumn, 4))
     counter = 0
@@ -104,6 +84,7 @@ def charArrayReader(charList):
             for n in range(4):
                 charThing = charList[counter]
                 multiMatrix[r,c,n] = charThing
+                multiMatrix[r,c,n] = charList[counter]
                 counter = counter + 1
     return multiMatrix
 
@@ -140,12 +121,15 @@ def readFromFile(fileRead):
     return outList #return a list of 4 matrices
 
 #should create a file that can then be read by the c++ program
-def toCSV(matrixList, fileLoc):
-    helpint = 0
+def toCSV(matrixList, fileLoc, rows, cols):
+    fileLoc.write(f"{rows} {cols}\n")
+    for r in range(rows):
+        for c in range(cols):
+            for n in range(4):
+                fileLoc.write(str(matrixList[n][r,c]))
+    return
+
 """ Start of main method"""
-
-
-
 
 bigMatrix = charArrayReader(charArray)
 SVDList = [] #List of SVD objects
@@ -161,13 +145,15 @@ for decomp in SVDList:
     writeToFile(currTripleList, sizeRow, sizeCol, fileWrite)
 fileWrite.close()
 
-"""Now time to decode"""
+"""Now time to decode. Independent of everything above except the file"""
 fileRead = open(fileLocationBin, "rb")
 matrixList = readFromFile(fileRead)
+readRow, readCol = matrixList[0].shape
 fileRead.close()
 
 
 """Now time to export from here to a csv to present in c++"""
-fileWriteCSV = open(fileLocationSV, 'w')
+fileWriteCSV = open(fileLocationCSV, 'w')
+toCSV(matrixList, fileLocationCSV, readRow, readCol)
 
         
