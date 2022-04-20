@@ -9,9 +9,9 @@ class triple:
         #sigma is a scalar
         self.sigma = float(_sigma)
         #v is a nx1 vector
-        self.v = _v.astype(np.float)
+        self.v = _v.real.astype(np.float)
         #u is a mx1 vector
-        self.u = _u.astype(np.float)
+        self.u = _u.real.astype(np.float)
     #This is all we need for a triple, will want to make a list of n triples and
     #sort by sigma
 
