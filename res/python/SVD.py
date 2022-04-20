@@ -127,7 +127,7 @@ def toCSV(matrixList, fileLoc, rows, cols):
 """ Start of main method"""
 #debugging statement
 #cwd = os.getcwd()
-print("Current working directory: {0}".format(cwd))
+#print("Current working directory: {0}".format(cwd))
 sizeCol = sizeColumn
 print("            Reading character array...")
 bigMatrix = charArrayReader(charArray)
