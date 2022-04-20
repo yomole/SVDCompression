@@ -139,10 +139,8 @@ SVDList = [] #List of SVD objects
 for i in range(4):
     print("             Compressing...")
     SVDList.append(SVD(bigMatrix[:,:,i]))
-
-writeRow = SVDList[0].m
-writeCol = SVDList[0].n
-k = getK(writeRow, writeCol, fileLim)
+    
+k = getK(sizeRow, sizeCol, fileLim)
 #Now for each SVD in the list, we want to get its kth approx and then write it
 fileWrite = open(fileLocationBin, "wb")
 headerInfo = [k, sizeRow, sizeCol]
