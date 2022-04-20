@@ -45,6 +45,7 @@ class SVD:
         self.tripleList = []
         #This should compute n columns of A*v_i/sigma_i
         for i in range(self.n):
+            print(f"Hey I am computing the {i}th singular values")
             if self.sigma[i] == 0:
                 self.u[:,i] = np.dot(A, self.v[:,i]) * 0
             else:
