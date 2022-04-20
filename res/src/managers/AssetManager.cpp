@@ -428,6 +428,11 @@ Image AssetManager::csvToImage(const string &fileLocation, const string& fileFor
     unsigned int rowN, colN;
     Image image;
 
+    //Create missing texture if needed.
+    if (textures.empty()){
+        addTexture(MISSING_TEXTURE.data());
+    }
+
     if (file.is_open()) {
         //1. Get first line which is the row and columns.
         string line;
@@ -447,6 +452,7 @@ Image AssetManager::csvToImage(const string &fileLocation, const string& fileFor
         catch (exception &exception) {
             cerr << "The rows and columns were not formatted correctly!"
                  << endl << "rows: " << rows << endl << "cols: " << cols << endl;
+            return getTexture(MISSING_TEXTURE.data()).copyToImage();
         }
 
         sf::Uint8 array[size];
@@ -474,7 +480,7 @@ Image AssetManager::csvToImage(const string &fileLocation, const string& fileFor
 
     else{
         cerr << "File " << fileLocation << " does not exist! Returning missing texture..." << endl;
-        return AssetManager::getTexture(MISSING_TEXTURE.data()).copyToImage();
+        return getTexture(MISSING_TEXTURE.data()).copyToImage();
     }
 }
 
