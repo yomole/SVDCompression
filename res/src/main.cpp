@@ -36,7 +36,10 @@ string getPrefix();
 int main(int argc, char* argv[]) {
 
     cout << "Starting directory is: " << (getPrefix().empty() ? "SVDCompression\\" : "SVDCompression\\bin") << endl;
-    AssetManager::setPrefix(getPrefix().data());
+    sf::RenderWindow window(sf::VideoMode(0, 0),
+                            "Media Compression by iCompression: Qualitative Comparison", sf::Style::Close);
+    AssetManager(getPrefix().data());
+    window.close();
 
     //Load the python interpreter to keep it alive for as long as possible.
     scope = new py::scoped_interpreter{};

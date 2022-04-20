@@ -446,7 +446,7 @@ Image AssetManager::csvToImage(const string &fileLocation, const string& fileFor
         try {
             colN = stoi(cols);
             rowN = stoi(rows);
-            size = rowN * colN;
+            size = rowN * colN * 4;
         }
 
         catch (exception &exception) {
@@ -455,12 +455,13 @@ Image AssetManager::csvToImage(const string &fileLocation, const string& fileFor
             return getTexture(MISSING_TEXTURE.data()).copyToImage();
         }
 
-        sf::Uint8 array[size];
+        auto* array = new sf::Uint8[size];
 
         //3. Parse the array and place each value in the array.
         getline(file, line);
         parse.clear();
         parse.str(line);
+
         unsigned int currPixel = 0;
 
         while (!parse.eof()) {
@@ -468,13 +469,24 @@ Image AssetManager::csvToImage(const string &fileLocation, const string& fileFor
             sf::Uint8 pixelValue;
 
             parse >> pixelString;
-            pixelValue = stoi(pixelString);
 
-            array[currPixel++] = pixelValue;
+            if (!pixelString.empty()) {
+                try {
+                    pixelValue = stoi(pixelString);
+                }
+
+                catch (std::exception &exception) {
+                    cout << "currPixel: " << currPixel << endl;
+                    cout << "pixelString:" << pixelString << "Here" << endl;
+                }
+
+                array[currPixel++] = pixelValue;
+            }
         }
 
-        image.create(rowN, colN / 4, array);
+        image.create(rowN, colN, array);
 
+        delete[] array;
         return image;
     }
 
@@ -494,6 +506,14 @@ void AssetManager::setPrefix(const string &prefixIn){
 
 const string& AssetManager::getOutputFolder(){
     return outputFolder;
+}
+
+void AssetManager::setOutputFolder(const string &outputFolder){
+    AssetManager::outputFolder = outputFolder;
+}
+
+void AssetManager::setTextureFolder(const string &textureFolder){
+    AssetManager::textureFolder = textureFolder;
 }
 
 bool AssetManager::isLoaded(){

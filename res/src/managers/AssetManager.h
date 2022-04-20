@@ -182,6 +182,16 @@ public:
     ///@returns The output folder registered in AssetManager.
     static const string& getOutputFolder();
 
+    ///@brief Sets the output folder.
+    ///@param outputFolder The output folder to register in AssetManager.
+    static void setOutputFolder(const string& outputFolder);
+
+    ///@brief Sets the texture folder.
+    ///@param outputFolder The texture folder to register in AssetManager.
+    static void setTextureFolder(const string& textureFolder);
+
     ///@returns The loaded boolean.
     static bool isLoaded();
+
+
 };
