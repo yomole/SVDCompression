@@ -1,8 +1,6 @@
 import numpy as np
 from numpy.linalg import eig
 import struct
-import os
-
 
 class triple:
     def __init__(self, _sigma, _v, _u):
@@ -129,9 +127,7 @@ def toCSV(matrixList, fileLoc, rows, cols):
     return
 
 """ Start of main method"""
-#debugging statement
-#cwd = os.getcwd()
-#print("Current working directory: {0}".format(cwd))
+
 sizeCol = sizeColumn
 print("            Reading character array...")
 bigMatrix = charArrayReader(charArray)
@@ -166,17 +162,5 @@ print("             Writing CSV file...")
 toCSV(matrixList, fileWriteCSV, readRow, readCol)
 fileWriteCSV.close()
 
-"""Control test"""
-"""
-bigMatrixList = []
-for i in range(4):
-    bigMatrixList.append(bigMatrix[:,:,i])
-#should now have list of matrices that were passed in directly from char array
-fileLocationControl = fileLocationCSV + ".test"
-fileWriteControl = open(fileLocationControl, 'w')
-print("             Writing control test csv...")
-toCSV(bigMatrixList, fileWriteControl, sizeRow, sizeCol)
-fileWriteControl.close()
-"""
 
         
