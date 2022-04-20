@@ -166,4 +166,16 @@ print("             Writing CSV file...")
 toCSV(matrixList, fileWriteCSV, readRow, readCol)
 fileWriteCSV.close()
 
+"""Control test"""
+bigMatrixList = []
+for i in range(4):
+    bigMatrixList.append(bigMatrix[:,:,i])
+#should now have list of matrices that were passed in directly from char array
+fileLocationControl = fileLocationCSV + ".test"
+fileWriteControl = open(fileLocationControl, 'w')
+print("             Writing control test csv...")
+toCSV(bigMatrixList, fileWriteControl, sizeRow, sizeCol)
+fileWriteControl.close()
+
+
         
