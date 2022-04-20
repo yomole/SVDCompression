@@ -7,7 +7,7 @@ import os
 class triple:
     def __init__(self, _sigma, _v, _u):
         #sigma is a scalar
-        self.sigma = double(_sigma)
+        self.sigma = float(_sigma)
         #v is a nx1 vector
         self.v = _v.real.astype(np.float)
         #u is a mx1 vector
