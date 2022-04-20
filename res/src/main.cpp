@@ -8,6 +8,7 @@
 #include "managers/AssetManager.h"
 #include "commands/Commands.h"
 #include "python/PythonScript.h"
+#include "huffman-coding/Huffman.h"
 #include "ui/viewer/ImageViewer.h"
 
 using sf::Event;
@@ -33,10 +34,16 @@ void printAbout();
 ///@brief Checks the working directory and gets the prefix which ensures we are running in SVDCompression/
 string getPrefix();
 
+///@brief Runs the Huffman Encoding Algorithm.
+void huffmanAlgorithm();
+
 int main(int argc, char* argv[]) {
 
     cout << "Starting directory is: " << (getPrefix().empty() ? "SVDCompression\\" : "SVDCompression\\bin") << endl;
-    AssetManager::setPrefix(getPrefix().data());
+    sf::RenderWindow window(sf::VideoMode(0, 0),
+                            "Media Compression by iCompression: Qualitative Comparison", sf::Style::Close);
+    AssetManager(getPrefix().data());
+    window.close();
 
     //Load the python interpreter to keep it alive for as long as possible.
     scope = new py::scoped_interpreter{};
@@ -158,6 +165,7 @@ int main(int argc, char* argv[]) {
             }
 
             else if (args.size() == 2) {
+                huffmanAlgorithm();
                 SVDAlgorithm(AssetManager::getPrefix() + "res/python/SVD.py", args.at(0), args.at(1));
             }
         }
@@ -271,4 +279,26 @@ string getPrefix(){
         cerr << "The executable's location or shortcut working directory is not correct!" << endl;
         exit(1);
     }
+}
+
+void huffmanAlgorithm(){
+    if (AssetManager::getFiles().empty()){
+        cerr << "File list is empty!" << endl;
+        return;
+    }
+
+    set<char*> modifiedFiles;
+    for (auto& file : AssetManager::getFiles()){
+        string data = file;
+        modifiedFiles.insert(data.data());
+    }
+
+    cout << "Running Huffman encoding algorithm on " << AssetManager::getFiles().size() << " files...";
+    time_t begin, end;
+    time(&begin);
+
+    compressFile("5", modifiedFiles);
+
+    time(&end);
+    cout << "Done! (Took " << difftime(end, begin) << " seconds)" << endl;
 }

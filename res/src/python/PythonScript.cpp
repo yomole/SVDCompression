@@ -1,7 +1,7 @@
 #include "PythonScript.h"
 
 //References for Pybind implementation can be found on README.md.
-//Literally all of them were used, and some code snippets were modified to suit our implementation
+//Literally all of them were used, and some code snippets were modified to suit our implementation.
 //(I'm never embedding Python ever again ;_; ).
 
 void SVDAlgorithm(const string& scriptLocation, const string& size, const string& imageFormat,
@@ -9,7 +9,7 @@ void SVDAlgorithm(const string& scriptLocation, const string& size, const string
     unsigned long long sizeNum = 0;
 
     //1. Make sure that the image format is valid.
-    if (!AssetManager::validFile(imageFormat)){
+    if (!AssetManager::validFile(imageFormat)) {
         cerr << "File format \"" << imageFormat << "\" is not valid!" << endl;
         cerr << "(Did you forget the \".\"?)" << endl;
         return;
@@ -17,23 +17,22 @@ void SVDAlgorithm(const string& scriptLocation, const string& size, const string
 
 
     //1. Try to convert the target size to bytes.
+
     if (!sizeToBytes(size, sizeNum)) {
         return;
-    }
-
-    else if (sizeNum == 0) {
+    } else if (sizeNum == 0) {
         cerr << "Compression target size cannot be 0!" << endl;
         return;
     }
 
-    //Check if the files list is empty when we first run the program.
+        //Check if the files list is empty when we first run the program.
     else if (files.empty()) {
         cerr << "There are no files in the file list!" << endl;
         return;
     }
 
     //Remove files from the file list that are smaller than the cutoff size.
-    removeBadSizes(sizeNum, files);
+    //removeBadSizes(sizeNum, files);
 
     //Check if the file list is empty after we remove those that are smaller than the target.
     if (files.empty()) {
@@ -55,12 +54,12 @@ void SVDAlgorithm(const string& scriptLocation, const string& size, const string
     py::module_ np = py::module_::import("numpy");
     global["np"] = np;
 
-    //equivalent to from numpy.linalg import eig
+    //equivalent to from numpy.linalg import eig.
     py::module_ linalg = py::module_::import("numpy.linalg");
     global["eig"] = linalg.attr("eig");
 
-    //equivalent to from numpy.linalg import eig
-    global["norm"] = linalg.attr("norm");
+    //equivalent to import os.
+    global["os"] = py::module_::import("os");
 
     for (const string &file: files) {
         cout << "File: " << file << endl;
@@ -83,7 +82,7 @@ void SVDAlgorithm(const string& scriptLocation, const string& size, const string
         string binFileLocation = AssetManager::getOutputFolder() + fileName;
         imageFileLocation.replace(imageFileLocation.find_last_of('.'), 4, imageFormat);
         csvFileLocation.replace(csvFileLocation.find_last_of('.'), 4, ".csv");
-        binFileLocation.replace(csvFileLocation.find_last_of('.'), 4, ".bin");
+        binFileLocation.replace(binFileLocation.find_last_of('.'), 4, ".bin");
 
         //3. Cast the required arguments to python variables.
         cout << "\tConstructing Python arguments for SVD Algorithm...";
@@ -94,12 +93,15 @@ void SVDAlgorithm(const string& scriptLocation, const string& size, const string
         global["charArray"] = py::cast(&array);
         global["sizeRow"] = py::cast(row);
         global["sizeColumn"] = py::cast(col);
-        cout << "Done!" << endl;
+        //cout << "Done!" << endl;
 
         //4. Run the script and add the file to the list of compressed files, if successful.
-        cout << "\tProcessing image...";
-        if (runPy(scriptLocation, global, local)){
-            cout << "Done!" <<endl;
+        cout << "\tStarting timer and processing image...";
+        time_t begin, end;
+        time(&begin);
+        if (runPy(scriptLocation, global, global)) {
+            time(&end);
+            cout << "Done! (Took " << difftime(end, begin) << " seconds)" << endl;
             cout << "\tExporting and adding to compressed files list...";
 
             //5. Export the image.
@@ -108,17 +110,22 @@ void SVDAlgorithm(const string& scriptLocation, const string& size, const string
                 cerr << endl << "\tCould not export image to " << imageFileLocation << endl;
             }
 
-            //6. Add the new image to the Asset Manager.
-            if (!AssetManager::addFile(imageFileLocation)){
-                    cerr << endl << "Could not add the processed file to the Asset Manager! You will not be able to "
-                                    "see the image in the program." << endl;
+            //5. Export the image.
+            if (!AssetManager::exportImage(AssetManager::csvToImage(csvFileLocation + ".test"),
+                                           imageFileLocation)) {
+                cerr << endl << "\tCould not export image to " << imageFileLocation << endl;
             }
 
-            else {
-                cerr << endl << "\tCould not process " << file << "!" << endl;
+            //6. Add the new image to the Asset Manager.
+            if (!AssetManager::addFile(imageFileLocation, COMPRESSED)) {
+                cerr << endl << "Could not add the processed file to the Asset Manager! You will not be able to "
+                                "see the image in the program." << endl;
             }
-            cout << "Done!" << endl;
         }
+        else {
+            cerr << endl << "\tCould not process " << file << "!" << endl;
+        }
+        cout << "Done!" << endl;
     }
 }
 
@@ -130,6 +137,7 @@ bool runPy(const string& fileLocation, const py::dict& global, const py::dict& l
         }
         catch(py::error_already_set& exception){
             cerr << endl << "\tProgram encountered a Python issue when running " << fileLocation << endl;
+            cerr << exception.what();
             return false;
         }
         return true;

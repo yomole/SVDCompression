@@ -5,6 +5,7 @@
 #include <filesystem>
 #include <set>
 #include <vector>
+#include <ctime>
 #include <pybind11/pybind11.h>
 #include <pybind11/eval.h>
 #include <pybind11/numpy.h>
