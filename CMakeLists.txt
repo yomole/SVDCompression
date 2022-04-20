@@ -37,10 +37,14 @@ set(sources
         res/src/commands/Commands.h
         res/src/python/PythonScript.cpp
         res/src/python/PythonScript.h
-        res/src/ui/view/Scene.cpp
-        res/src/ui/view/Scene.h
-        res/src/ui/functions/ButtonFunctions.h
-        res/src/ui/functions/ButtonFunctions.cpp)
+        res/src/ui/scene/Scene.cpp
+        res/src/ui/scene/Scene.h
+        res/src/ui/Checkbox.cpp
+        res/src/ui/Checkbox.h
+        res/src/ui/viewer/ImageViewer.cpp
+        res/src/ui/viewer/ImageViewer.h
+        res/src/huffman-coding/Huffman.cpp
+        res/src/huffman-coding/Huffman.h)
 
 add_executable(SVDCompression ${sources})
 

@@ -1,10 +1,8 @@
 #include "UIElement.h"
 
-UIElement::UIElement(const string& name, vector<string>& arguments,
-                     const std::function<void(vector<string>&)>& function){
+UIElement::UIElement(const string &name, const std::function<void()> &function) {
     this->name = name;
     this->function = function;
-    this->arguments = arguments;
 }
 
 const string& UIElement::getName() const{
@@ -12,5 +10,5 @@ const string& UIElement::getName() const{
 }
 
 void UIElement::callFunction(){
-    function(arguments);
+    function();
 }

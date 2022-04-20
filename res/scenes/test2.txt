@@ -1,5 +1,28 @@
+#   NOTE: Buttons and checkboxes are NOT defined here.
+#   Because they can use functions, they must be defined in the source code!
+
+#   Available UI Elements: button, image, text, progressBar, checkbox
+#   Available Fonts: default
+#   You may also type out the name of the font you want from the font folder.
+
+#   SYNTAX:
+#   button [name] "[texture name]" [x position] [y position] [function**]
+#   checkbox [name] "[texture name]" [x position] [y position] [function**]
+#   progressBar [name] [x position] [y position] [x size] [y size]
+#   text [name] [x position] [y position] [font] [font size] [text]
+#   image* [name] "[texture name]" [x position] [y position] [x scale] [y scale]
+
+#   * for images, putting _NULL_ into textureName does not preload image with an image.
+#   ** for functions, check res/ui/functions/ButtonFunctions.h to look at a list of functions. Make sure to put any
+#   ** arguments after the function name!
+
+#   VIEW NAME: TEST2
+#   Test for the view system
+
 text test 0 50 default 20 Hello, I am also text!
-image beach.jpg ../input/beach.jpg 575 100 .10 .10
+image functionTest input/beach.jpg 575 100 .10 .10
 button goBack test.png 0 100 ChangeScene test
 text info 0 165 default 20 Click below to cycle through the images in the input folder.
-button change test.png 0 200 CycleImages test2 beach.jpg 2 _files_
+text count 0 270 default 30 [COUNT]
+button changefwd Forward.png 96 200 CycleImagesFwd test2 functionTest changerev 0 _FILES_
+button changerev Reverse.png 0 200 CycleImagesRev test2 functionTest changefwd 0 _FILES_

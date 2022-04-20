@@ -15,9 +15,9 @@ SceneManager::SceneManager(RenderWindow* window){
     SceneManager::currentView = nullptr;
 }
 
-bool SceneManager::addView(const string &viewName, const string &viewFile){
-    if (scenes.count(viewName) == 0) {
-        scenes.insert(pair<string, Scene>(viewName, Scene(viewFile)));
+bool SceneManager::addScene(const string &sceneName){
+    if (scenes.count(sceneName) == 0) {
+        scenes.insert(pair<string, Scene>(sceneName, Scene()));
         return true;
     }
     else{
@@ -25,9 +25,9 @@ bool SceneManager::addView(const string &viewName, const string &viewFile){
     }
 }
 
-bool SceneManager::changeView(const string &viewName){
-    if (scenes.count(viewName) != 0){
-        currentView = &(scenes.at(viewName));
+bool SceneManager::changeScene(const string &sceneName){
+    if (scenes.count(sceneName) != 0){
+        currentView = &(scenes.at(sceneName));
         return true;
     }
     else{
@@ -35,18 +35,18 @@ bool SceneManager::changeView(const string &viewName){
     }
 }
 
-Scene& SceneManager::getView(const string &viewName){
-    if (scenes.count(viewName) != 0){
-        return scenes.at(viewName);
+Scene& SceneManager::getScene(const string &sceneName){
+    if (scenes.count(sceneName) != 0){
+        return scenes.at(sceneName);
     }
     else{
-        cerr << "Scene " << viewName << " does not exist! Returning current view...";
+        cerr << "Scene " << sceneName << " does not exist! Returning current scene...";
         return *currentView;
     }
 }
 
 void SceneManager::drawAll(){
-    //1. Check the current view pointer.
+    //1. Check the current scene pointer.
     if (currentView){
         //2. Draw every element in every map.
         for (auto& i : currentView->getButtons()){
@@ -74,6 +74,12 @@ void SceneManager::drawAll(){
                 window->draw(*i.second);
             }
         }
+
+        for (auto& i: currentView->getCheckboxes()){
+            if (i.first != "NULL"){
+                window->draw(i.second->getSprite());
+            }
+        }
     }
 
     else{
@@ -82,7 +88,7 @@ void SceneManager::drawAll(){
 }
 
 void SceneManager::activateElement(const Vector2i &mouseLocation){
-    //1. Check the view pointer.
+    //1. Check the scene pointer.
     if (currentView){
         //2. Call the function if the mouse is over an interactable object (BUTTONS HAVE PRIORITY).
         for (auto& i : currentView->getButtons()){

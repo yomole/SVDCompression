@@ -1,0 +1,17 @@
+#   Available UI Elements: button, image, text, progressBar
+#   Available Fonts: default
+#   You may also type out the name of the font you want from the font folder.
+
+#   SYNTAX:
+#   button [name] [texture name] [x position] [y position] [function**]
+#   checkbox [name] [texture name] [x position] [y position] [function**]
+#   progressBar [name] [x position] [y position] [x size] [y size]
+#   text [name] [x position] [y position] [font] [font size] [text]
+#   image* [name] [texture name] [x position] [y position] [x scale] [y scale]
+
+#   * for images, putting _NULL_ into textureName does not preload image with an image.
+#   ** for functions, check res/ui/functions/ButtonFunctions.h to look at a list of functions. Make sure to put any
+#   ** arguments after the function name!
+
+#   VIEW NAME: CLITest
+#   The view to show compressed images in CLI.

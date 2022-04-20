@@ -1,0 +1,7 @@
+# Command file for program's Command File Mode.
+# These are comments! Whitespace is also ignored.
+
+# Add all files in input folder and open the image viewer for testing.
+decompress output/huffman/beach.bin output/huffman/images/beach.jpg
+# Do not forget "exit" at the end (or else it will go into an infinite loop)!
+exit
