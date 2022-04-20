@@ -107,7 +107,9 @@ def readFromFile(fileRead):
     for i in range(4):
         currTripleList = []
         for kLoop in range(newK):
-            newSigma = struct.unpack('f', fileRead.read(4))
+            newSigmaBefore = struct.unpack('f', fileRead.read(4))
+            print(newSigmaBefore)
+            newSigma = sum(newSigmaBefore)
             newV = struct.unpack('%sf' % newCol, fileRead.read(newCol*4))
             newU = struct.unpack('%sf' % newRow, fileRead.read(newRow*4))
             currTripleList.append(triple(newSigma, np.array(newV), np.array(newU)))
