@@ -155,5 +155,6 @@ fileRead.close()
 """Now time to export from here to a csv to present in c++"""
 fileWriteCSV = open(fileLocationCSV, 'w')
 toCSV(matrixList, fileLocationCSV, readRow, readCol)
+fileWriteCSV.close()
 
         
