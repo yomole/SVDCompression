@@ -124,5 +124,16 @@ print("Comparing the 2 reconstructed matrices")
 print(norm(testApproxMatrix1 - testApproxMatrix2))
 fileRead.close()
 
+nums = [1,2,3]
+fileWrite2 = open("testwriting2.txt", 'w')
+for number in nums:
+    fileWrite2.write(str(number))
+    fileWrite2.write(" ")
+fileWrite2.write("\n4")
+fileWrite2.close()
 
+test2 = np.zeros((3,5))
+testRow, testCol = test2.shape
+print(testRow)
+print(testCol)
 
