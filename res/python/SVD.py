@@ -7,11 +7,11 @@ import os
 class triple:
     def __init__(self, _sigma, _v, _u):
         #sigma is a scalar
-        self.sigma = _sigma
+        self.sigma = float(_sigma)
         #v is a nx1 vector
-        self.v = _v
+        self.v = _v.astype(np.float)
         #u is a mx1 vector
-        self.u = _u
+        self.u = _u.astype(np.float)
     #This is all we need for a triple, will want to make a list of n triples and
     #sort by sigma
 
@@ -38,7 +38,7 @@ class SVD:
         #This should compute n columns of A*v_i/sigma_i
         for i in range(self.n):
             if self.sigma[i] == 0:
-                self.u[:,i] = np.dot(A, self.v[:,i]) * 0
+                self.u[:,i] = np.dot(A, self.v[:,i]) * 0.0
             else:
                 self.u[:,i] = np.dot(A,self.v[:,i]) / self.sigma[i] 
                 self.tripleList.append(triple(self.sigma[i], self.v[:,i], self.u[:,i]))
