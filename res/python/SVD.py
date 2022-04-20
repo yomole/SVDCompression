@@ -133,6 +133,7 @@ def toCSV(matrixList, fileLoc, rows, cols):
 print("             Reading character array...")
 bigMatrix = charArrayReader(charArray)
 SVDList = [] #List of SVD objects
+print("             Compressing...")
 for i in range(4):
     SVDList.append(SVD(bigMatrix[:,:,i]))
 k = getK(fileLim)
