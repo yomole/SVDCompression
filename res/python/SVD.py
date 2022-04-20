@@ -81,14 +81,16 @@ def getK(row, col, size):
     return (size - 12) // (16*(1+row+col))
 
 def charArrayReader(charList):
-    multiMatrix = np.zeros((sizeRow, sizeColumn, 4))
+    matrixR = np.zeros(sizeRow, sizeColumn)
+    matrixG = np.zeros(sizeRow, sizeColumn)
+    matrixB = np.zeros(sizeRow, sizeColumn)
+    matrixA = np.zeros(sizeRow, sizeColumn)
+    multiMatrix = [matrixR, matrixG, matrixB, matrixA]
     counter = 0
     for r in range(sizeRow):
         for c in range(sizeColumn):
             for n in range(4):
-                charThing = charList[counter]
-                multiMatrix[r,c,n] = charThing
-                multiMatrix[r,c,n] = charList[counter]
+                multiMatrix[n][r,c] = charList[counter]
                 counter = counter + 1
     return multiMatrix
 
@@ -135,11 +137,11 @@ def toCSV(matrixList, fileLoc, rows, cols):
 
 """ Start of main method"""
 print("            Reading character array...")
-bigMatrix = charArrayReader(charArray)
+matrixList = charArrayReader(charArray)
 SVDList = [] #List of SVD objects
 for i in range(4):
     print("             Compressing...")
-    SVDList.append(SVD(bigMatrix[:,:,i]))
+    SVDList.append(SVD(matrixList[i]))
 
 writeRow = SVDList[0].m
 writeCol = SVDList[0].n
