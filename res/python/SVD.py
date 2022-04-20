@@ -4,10 +4,12 @@ from numpy.linalg import norm
 import struct
 
 """NEED TO REMOVE"""
-#sizeRow = 10
-#sizeColumn = 10
-#fileLim = 10
-#charArray = [1,3,4,344]
+#sizeRow = 2
+#sizeColumn = 2
+#fileLim = 10000
+#charArray = [2,3,4,255,2,3,4,255,2,3,4,255,2,3,4,255]
+#fileLocation = "Something"
+#fileName = "SomethingElse"
 """NEED TO REMOVE"""
 
 class triple:
@@ -70,8 +72,9 @@ def breakLine(inputString):
     outList.append(currWord)
     return outList
 
+#Get this from 12 + 4*4(1+row+col). One 4 for each matrix, other for bytes in a float
 def getK(row, col, size):
-    return (size - 12) // (4*(1+row+col))
+    return (size - 12) // (16*(1+row+col))
 
 """
 class fileReader:
@@ -99,35 +102,72 @@ def charArrayReader(charList):
     for r in range(sizeRow):
         for c in range(sizeColumn):
             for n in range(4):
+                charThing = charList[counter]
+                multiMatrix[r,c,n] = charThing
                 counter = counter + 1
-                multiMatrix[r,c,n] = charList[counter]
     return multiMatrix
 
 
+#This recreates a matrix from the singular values 
+def reconstruct(listOfTriples, rows, cols):
+    outMatrix = np.zeros((rows, cols))
+    for tripleVals in listOfTriples:
+        outMatrix = outMatrix + tripleVals.sigma * np.outer(tripleVals.u, tripleVals.v)
+    return outMatrix
 
+#already expects a header to be written
+def writeToFile(listOfTriples, rows, cols, fileWrite):
+    for triples in listOfTriples:
+        fileWrite.write(struct.pack('f', triples.sigma))
+        vList = triples.v.tolist()
+        uList = triples.u.tolist()
+        fileWrite.write(struct.pack('%sf' % cols, *vList))
+        fileWrite.write(struct.pack('%sf' % rows, *uList))
 
-#now to break down each matrix into its components and send them out piece by piece
+#outputs a list of each of the 4 RGBA matrices
+def readFromFile(fileRead):
+    newK, newRow, newCol = struct.unpack('3i', fileRead.read(12))
+    outList = []
+    for i in range(4):
+        currTripleList = []
+        for kLoop in range(newK):
+            newSigma = struct.unpack('f', fileRead.read(4))
+            newV = struct.unpack('%sf' % newCol, fileRead.read(newCol*4))
+            newU = struct.unpack('%sf' % newRow, fileRead.read(newRow*4))
+            currTripleList.append(triple(newSigma, np.array(newV), np.array(newU)))
+        #after we get our triple list, we want to reconstruct, append, then move next
+        outList.append(reconstruct(currTripleList, newRow, newCol))
+    return outList #return a list of 4 matrices
+
+#should create a file that can then be read by the c++ program
+def toCSV(matrixList, fileLoc):
+    helpint = 0
 """ Start of main method"""
 
-bigMatrix = charArrayReader(charArray)
-k = getK(sizeRow, sizeColumn, fileLim)
-print("Printing k value")
-print(k)
-print("Printing each matrix")
-for i in range(4):
-    print(bigMatrix[:,:,i])
 
 
-"""
+
 bigMatrix = charArrayReader(charArray)
-SVDList = []
+SVDList = [] #List of SVD objects
 for i in range(4):
     SVDList.append(SVD(bigMatrix[:,:,i]))
 k = getK(fileLim)
-#double list of triples goes here
-doubleList = []
-for matrix in SVDList:
-    doubleList.append(matrix.getKthApprox(k))
-"""
-        
+#Now for each SVD in the list, we want to get its kth approx and then write it
+fileWrite = open(fileLocationBin, "wb")
+headerInfo = [k, sizeRow, sizeCol]
+fileWrite.write(struct.pack('3i', *headerInfo))
+for decomp in SVDList:
+    currTripleList = decomp.getKthApprox(k)
+    writeToFile(currTripleList, sizeRow, sizeCol, fileWrite)
+fileWrite.close()
+
+"""Now time to decode"""
+fileRead = open(fileLocationBin, "rb")
+matrixList = readFromFile(fileRead)
+fileRead.close()
+
+
+"""Now time to export from here to a csv to present in c++"""
+fileWriteCSV = open(fileLocationSV, 'w')
+
         
