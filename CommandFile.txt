@@ -2,8 +2,8 @@
 # These are comments! Whitespace is also ignored.
 
 # Add all files in input folder and open the image viewer for testing.
-addf "input"
-show all
+add input/beach.jpg
+compress 300k .png
 
 # Do not forget "exit" at the end (or else it will go into an infinite loop)!
 exit

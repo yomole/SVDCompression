@@ -117,8 +117,8 @@ void SVDAlgorithm(const string& scriptLocation, const string& size, const string
             else {
                 cerr << endl << "\tCould not process " << file << "!" << endl;
             }
+            cout << "Done!" << endl;
         }
-        cout << "Done!" << endl;
     }
 }
 
@@ -130,8 +130,6 @@ bool runPy(const string& fileLocation, const py::dict& global, const py::dict& l
         }
         catch(py::error_already_set& exception){
             cerr << endl << "\tProgram encountered a Python issue when running " << fileLocation << endl;
-            exception.what();
-            exception.trace();
             return false;
         }
         return true;
