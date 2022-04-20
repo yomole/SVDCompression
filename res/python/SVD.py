@@ -7,7 +7,7 @@ import os
 class triple:
     def __init__(self, _sigma, _v, _u):
         #sigma is a scalar
-        self.sigma = float(_sigma)
+        self.sigma = double(_sigma)
         #v is a nx1 vector
         self.v = _v.real.astype(np.float)
         #u is a mx1 vector
@@ -69,7 +69,8 @@ def breakLine(inputString):
 
 #Get this from 12 + 4*4(1+row+col). One 4 for each matrix, other for bytes in a float
 def getK(row, col, size):
-    return (size - 12) // (16*(1+row+col))
+    kCandidate = (size - 12) // (32*(1+row+col))
+    return min(kCandidate, col)
 
 def charArrayReader(charList):
     multiMatrix = np.zeros((sizeRow, sizeColumn, 4))
@@ -94,11 +95,11 @@ def reconstruct(listOfTriples, rows, cols):
 #already expects a header to be written
 def writeToFile(listOfTriples, rows, cols, fileWrite):
     for triples in listOfTriples:
-        fileWrite.write(struct.pack('f', triples.sigma))
+        fileWrite.write(struct.pack('d', triples.sigma))
         vList = triples.v.tolist()
         uList = triples.u.tolist()
-        fileWrite.write(struct.pack('%sf' % cols, *vList))
-        fileWrite.write(struct.pack('%sf' % rows, *uList))
+        fileWrite.write(struct.pack('%sd' % cols, *vList))
+        fileWrite.write(struct.pack('%sd' % rows, *uList))
 
 #outputs a list of each of the 4 RGBA matrices
 def readFromFile(fileRead):
@@ -107,10 +108,10 @@ def readFromFile(fileRead):
     for i in range(4):
         currTripleList = []
         for kLoop in range(newK):
-            newSigmaBefore = struct.unpack('f', fileRead.read(4))
+            newSigmaBefore = struct.unpack('d', fileRead.read(8))
             newSigma = sum(newSigmaBefore)
-            newV = struct.unpack('%sf' % newCol, fileRead.read(newCol*4))
-            newU = struct.unpack('%sf' % newRow, fileRead.read(newRow*4))
+            newV = struct.unpack('%sd' % newCol, fileRead.read(newCol*8))
+            newU = struct.unpack('%sd' % newRow, fileRead.read(newRow*8))
             currTripleList.append(triple(newSigma, np.array(newV), np.array(newU)))
         #after we get our triple list, we want to reconstruct, append, then move next
         outList.append(reconstruct(currTripleList, newRow, newCol))
