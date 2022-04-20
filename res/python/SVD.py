@@ -130,7 +130,7 @@ def toCSV(matrixList, fileLoc, rows, cols):
     return
 
 """ Start of main method"""
-
+print("             Reading character array...")
 bigMatrix = charArrayReader(charArray)
 SVDList = [] #List of SVD objects
 for i in range(4):
@@ -139,14 +139,17 @@ k = getK(fileLim)
 #Now for each SVD in the list, we want to get its kth approx and then write it
 fileWrite = open(fileLocationBin, "wb")
 headerInfo = [k, sizeRow, sizeCol]
+print("             Writing binary file...")
 fileWrite.write(struct.pack('3i', *headerInfo))
 for decomp in SVDList:
     currTripleList = decomp.getKthApprox(k)
     writeToFile(currTripleList, sizeRow, sizeCol, fileWrite)
+
 fileWrite.close()
 
 """Now time to decode. Independent of everything above except the file"""
 fileRead = open(fileLocationBin, "rb")
+print("             Reading binary file...")
 matrixList = readFromFile(fileRead)
 readRow, readCol = matrixList[0].shape
 fileRead.close()
@@ -154,7 +157,8 @@ fileRead.close()
 
 """Now time to export from here to a csv to present in c++"""
 fileWriteCSV = open(fileLocationCSV, 'w')
-toCSV(matrixList, fileLocationCSV, readRow, readCol)
+print("             Writing CSV file...")
+toCSV(matrixList, fileWriteCSV, readRow, readCol)
 fileWriteCSV.close()
 
         
