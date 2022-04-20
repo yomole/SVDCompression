@@ -1,32 +1,25 @@
 #include "Huffman.h"
 
 //Compresses File using Huffman Coding
-void compressFile(const string &size, set<char*> &files)
+void compressFile(const char* path,const char* output_path, map<unsigned char, string>& codes)
 {
-    Huffman huff;
-    int sz = 0;
-    int paddedBits = 0;
-    map<unsigned char, int> freqTable;
-    for (auto& iter : files){
-        //read entire file content in a file and places in buffer to use later
-        unsigned char* buffer = readFileIntoBuffer(iter, sz);
-        for (int i = 0; i < sz; i++)
-        {
-            freqTable[buffer[i]]++;
-        }
-        //Building the Huffman create
-        Tree* root = buildHuffmanTree(convertToVector(freqTable));
-        traverseHuffmanTree(root, "", "", huff.getCode());
-        string outputString = getHuffmanBitstring(buffer, huff.getCode(), sz, paddedBits);
-        sz = outputString.size();
-        vector<unsigned char> outputBufferV;
-        getBufferFromString(outputString, outputBufferV, sz);
-        unsigned char* outputBuffer = outputBufferV.data();
-        //Check output path
-        writeHeader(iter, huff.getCode(), paddedBits);
-        //Writes out compressed file to show size
-        writeFileFromBuffer(iter, outputBuffer, sz, 1);
-    }
+	int sz = 0;
+	int paddedBits = 0;
+	map<unsigned char, int> freqtable;
+	unsigned char* buffer = readFileIntoBuffer(path, sz);
+	for (int i = 0; i < sz; i++)
+	{
+		freqtable[buffer[i]]++;
+	}
+	Tree* root = buildHuffmanTree(convertToVector(freqtable));
+	traverseHuffmanTree(root, "", "", codes);
+	string outputString = getHuffmanBitstring(buffer, codes, sz, paddedBits);
+	sz = outputString.size();
+	vector<unsigned char> outputBufferV;
+	getBufferFromString(outputString, outputBufferV, sz);
+	unsigned char* outputBuffer = outputBufferV.data();
+	writeHeader(output_path, codes, paddedBits);
+	writeFileFromBuffer(output_path, outputBuffer, sz, 1);
 }
 
 //Writes buffer file for an image
