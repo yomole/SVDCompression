@@ -145,7 +145,7 @@ writeCol = SVDList[0].n
 k = getK(writeRow, writeCol, fileLim)
 if k == 0:
     print("Too small!")
-    exit()
+    quit()
 #Now for each SVD in the list, we want to get its kth approx and then write it
 fileWrite = open(fileLocationBin, "wb")
 headerInfo = [k, sizeRow, sizeCol]
