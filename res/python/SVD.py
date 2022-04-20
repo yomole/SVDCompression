@@ -45,10 +45,12 @@ class SVD:
         self.tripleList = []
         #This should compute n columns of A*v_i/sigma_i
         for i in range(self.n):
-            self.u[:,i] = np.dot(A,self.v[:,i]) / self.sigma[i] 
-            self.tripleList.append(triple(self.sigma[i], self.v[:,i], self.u[:,i]))
+            if self.sigma[i] == 0:
+                self.u[:,i] = np.dot(A, self.v[:,i]) * 0
+            else:
+                self.u[:,i] = np.dot(A,self.v[:,i]) / self.sigma[i] 
+                self.tripleList.append(triple(self.sigma[i], self.v[:,i], self.u[:,i]))
         #now we have all of our singular values
-        #depending on how we want to store them, we can do a variety of different things
         """ Sorting goes here"""
         print("     sorting...")
         self.tripleList.sort(key= lambda x: x.sigma, reverse=True)
