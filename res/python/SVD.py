@@ -133,6 +133,7 @@ def toCSV(matrixList, fileLoc, rows, cols):
     return
 
 """ Start of main method"""
+sizeCol = sizeColumn
 print("            Reading character array...")
 bigMatrix = charArrayReader(charArray)
 SVDList = [] #List of SVD objects
