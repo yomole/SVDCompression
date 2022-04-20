@@ -15,6 +15,7 @@ using std::string;
 using std::cout;
 using std::endl;
 using std::cerr;
+using std::to_string;
 using sf::RenderWindow;
 using sf::Sprite;
 using sf::Text;

@@ -76,10 +76,21 @@ void SVDAlgorithm(const string& scriptLocation, const string& size, const string
         }
         cout << "Done!" << endl;
 
+        //4. Create the output fileLocation which includes new image name (C[name].
+        string fileName = fs::path(file).filename().string();
+        string imageFileLocation = AssetManager::getOutputFolder() + +"images/C_" + fileName;
+        string csvFileLocation = AssetManager::getOutputFolder() + "csv/" + fileName;
+        string binFileLocation = AssetManager::getOutputFolder() + fileName;
+        imageFileLocation.replace(imageFileLocation.find_last_of('.'), 4, imageFormat);
+        csvFileLocation.replace(csvFileLocation.find_last_of('.'), 4, ".csv");
+        binFileLocation.replace(csvFileLocation.find_last_of('.'), 4, ".bin");
+
         //3. Cast the required arguments to python variables.
         cout << "\tConstructing Python arguments for SVD Algorithm...";
         global["fileLocation"] = py::cast(&file);
         global["fileLim"] = py::cast(sizeNum);
+        global["fileLocationCSV"] = py::cast(&csvFileLocation);
+        global["fileLocationBin"] = py::cast(&binFileLocation);
         global["charArray"] = py::cast(&array);
         global["sizeRow"] = py::cast(row);
         global["sizeColumn"] = py::cast(col);
@@ -87,25 +98,18 @@ void SVDAlgorithm(const string& scriptLocation, const string& size, const string
 
         //4. Run the script and add the file to the list of compressed files, if successful.
         cout << "\tProcessing image...";
-        if (runPy(scriptLocation, global, local)) {
+        if (runPy(scriptLocation, global, local)){
             cout << "Done!" <<endl;
             cout << "\tExporting and adding to compressed files list...";
 
-            //4. Create the output fileLocation which includes new image name (C[name].
-            string fileName = fs::path(file).filename().string();
-            string newFileLocation = AssetManager::getOutputFolder() + +"C_" + fileName;
-            newFileLocation.replace(newFileLocation.find_last_of('.'), 4, imageFormat);
-
             //5. Export the image.
-            string csvLocation = AssetManager::getOutputFolder() + fileName;
-            csvLocation.replace(newFileLocation.find_last_of('.') + 1, 3, "csv");
-            if (!AssetManager::exportImage(AssetManager::csvToImage(csvLocation),
-                                           newFileLocation)) {
-                cerr << endl << "\tCould not export image to " << newFileLocation << endl;
+            if (!AssetManager::exportImage(AssetManager::csvToImage(csvFileLocation),
+                                           imageFileLocation)) {
+                cerr << endl << "\tCould not export image to " << imageFileLocation << endl;
             }
 
             //6. Add the new image to the Asset Manager.
-            if (!AssetManager::addFile(newFileLocation)){
+            if (!AssetManager::addFile(imageFileLocation)){
                     cerr << endl << "Could not add the processed file to the Asset Manager! You will not be able to "
                                     "see the image in the program." << endl;
             }
@@ -146,9 +150,11 @@ bool sizeToBytes(const string& size, unsigned long long& sizeNum){
     try{
         sizeNum = stoi(sizeNumString);
     }
+
     catch(invalid_argument& invalidArgument){
         cerr << "Size argument was not formatted correctly!" << endl;
     }
+
     catch(out_of_range& outOfRange){
         cerr << "Size argument is too big!" << endl;
     }

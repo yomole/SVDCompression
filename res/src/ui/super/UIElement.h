@@ -23,9 +23,10 @@ protected:
     function<void()> function; ///< Function embedded in the UI element.
 public:
     /// Default Constructor. Creates the UI element with the specified name and embedded function.
+    /// @param name Name of the UI element.
+    /// @param function Function to embed in the UI Element. Default is no operation.
     UIElement(const string &name, const std::function<void()>& function = []() -> void {});
 
-    ///@brief name accessor.
     ///@returns the name of the UI element.
     const string& getName() const;
 
