@@ -144,6 +144,7 @@ fileWrite.write(struct.pack('3i', *headerInfo))
 for decomp in SVDList:
     currTripleList = decomp.getKthApprox(k)
     writeToFile(currTripleList, sizeRow, sizeCol, fileWrite)
+
 fileWrite.close()
 
 """Now time to decode. Independent of everything above except the file"""
@@ -157,7 +158,7 @@ fileRead.close()
 """Now time to export from here to a csv to present in c++"""
 fileWriteCSV = open(fileLocationCSV, 'w')
 print("             Writing CSV file...")
-toCSV(matrixList, fileLocationCSV, readRow, readCol)
+toCSV(matrixList, fileWriteCSV, readRow, readCol)
 fileWriteCSV.close()
 
         
