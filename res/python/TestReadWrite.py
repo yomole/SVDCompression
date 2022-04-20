@@ -86,12 +86,12 @@ def reconstruct(listOfTriples, rows, cols):
     return outMatrix
 
 k = 5
-row = 1000
-col = 1000
-testMatrix = np.arange(1000000).reshape((row,col))
+row = 100
+col = 100
+testMatrix = np.arange(10000).reshape((row,col))
 testSVD = SVD(testMatrix)
 kthApprox = testSVD.getKthApprox(k)
-fileWrite = open("testWrite.bin", "wb")
+fileWrite = open("..\\testWrite.bin", "wb")
 headerInfo = [k, row, col]
 fileWrite.write(struct.pack('3i', *headerInfo))
 for triples in kthApprox:
@@ -108,7 +108,7 @@ testApproxMatrix1 = reconstruct(kthApprox, row, col)
 print(norm(testMatrix-testApproxMatrix1))
 
 """Testing reading"""
-fileRead = open("testWrite.bin", "rb")
+fileRead = open("..\\testWrite.bin", "rb")
 newK, newRow, newCol = struct.unpack('3i', fileRead.read(12))
 newTripleList = []
 for kLoop in range(newK):
@@ -125,7 +125,7 @@ print(norm(testApproxMatrix1 - testApproxMatrix2))
 fileRead.close()
 
 nums = [1,2,3]
-fileWrite2 = open("testwriting2.txt", 'w')
+fileWrite2 = open("..\\testwriting2.txt", 'w')
 for number in nums:
     fileWrite2.write(str(number))
     fileWrite2.write(" ")

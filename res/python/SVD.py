@@ -1,7 +1,7 @@
 import numpy as np
 from numpy.linalg import eig
-from numpy.linalg import norm
 import struct
+import os
 
 """NEED TO REMOVE"""
 #sizeRow = 2
@@ -133,6 +133,9 @@ def toCSV(matrixList, fileLoc, rows, cols):
     return
 
 """ Start of main method"""
+#debugging statement
+cwd = os.getcwd()
+print("Current working directory: {0}".format(cwd))
 sizeCol = sizeColumn
 print("            Reading character array...")
 bigMatrix = charArrayReader(charArray)
