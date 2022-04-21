@@ -88,8 +88,8 @@ set(sources
         res/src/ui/Checkbox.h
         res/src/ui/viewer/ImageViewer.cpp
         res/src/ui/viewer/ImageViewer.h
-        res/src/huffman-coding/Huffman.cpp
-        res/src/huffman-coding/Huffman.h)
+        res/huffman-coding/Huffman.cpp
+        res/huffman-coding/Huffman.h)
 
 add_executable(SVDCompression ${sources})
 

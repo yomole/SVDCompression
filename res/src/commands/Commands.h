@@ -14,6 +14,8 @@ enum Names{
         ADD,
         ADDF,
         COMPRESS,
+        CONVERT,
+        DECOMPRESS,
         HELP,
         LS,
         RM,

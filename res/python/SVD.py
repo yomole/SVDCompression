@@ -1,6 +1,7 @@
 import numpy as np
 from numpy.linalg import eig
 import struct
+import math
 
 class triple:
     def __init__(self, _sigma, _v, _u):
@@ -121,7 +122,12 @@ def toCSV(matrixList, fileLoc, rows, cols):
     for r in range(rows):
         for c in range(cols):
             for n in range(4):
-                currVal = round(matrixList[n][r,c])
+                if math.isnan(matrixList[n][r,c]):
+                    fileLoc.write("0 ")
+                    continue
+                currVal = round(abs(matrixList[n][r,c]))
+                if currVal > 255:
+                        currVal = 255
                 fileLoc.write(str(currVal))
                 fileLoc.write(" ")
     return

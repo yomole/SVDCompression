@@ -49,6 +49,28 @@ void getHelp(int command){
             break;
         }
 
+        case CONVERT:{
+            cout    << "convert \"[Original File]\" [file format]"
+                    << endl
+                    << "\tConverts the image file into another file format."
+                    << endl
+                    << "\tValid file extensions include: \".jpg\", \".png\", \".bmp\", and \".tga\"."
+                    << endl;
+            break;
+        }
+
+        case DECOMPRESS:{
+            cout    << "decompress \"[bin file]\" \"[new file location]\""
+                    << endl
+                    << "\tRuns the decompression function for Huffman Encoding."
+                    << endl
+                    << "\tNOTE: Include the file extension in the new file location!"
+                    << endl
+                    << "\tValid file extensions include: \".jpg\", \".png\", \".bmp\", and \".tga\"."
+                    << endl;
+            break;
+        }
+
         case RM:{
             cout    << "rm \"[File Location]\""
                     << endl

@@ -61,6 +61,9 @@ void SVDAlgorithm(const string& scriptLocation, const string& size, const string
     //equivalent to import os.
     global["os"] = py::module_::import("os");
 
+    //equivalent to import os.
+    global["math"] = py::module_::import("math");
+
     for (const string &file: files) {
         cout << "File: " << file << endl;
 
@@ -77,10 +80,9 @@ void SVDAlgorithm(const string& scriptLocation, const string& size, const string
 
         //4. Create the output fileLocation which includes new image name (C[name].
         string fileName = fs::path(file).filename().string();
-        string imageFileLocation = AssetManager::getOutputFolder() + "images/C_" + fileName;
-        string imageFileLocation2 = AssetManager::getOutputFolder() + "images/C2_" + fileName;
-        string csvFileLocation = AssetManager::getOutputFolder() + "csv/" + fileName;
-        string binFileLocation = AssetManager::getOutputFolder() + fileName;
+        string imageFileLocation = AssetManager::getOutputFolder() + "svd/images/" + fileName;
+        string csvFileLocation = AssetManager::getOutputFolder() + "temp/" + fileName;
+        string binFileLocation = AssetManager::getOutputFolder() + "svd/bin/" + fileName;
         imageFileLocation.replace(imageFileLocation.find_last_of('.'), 4, imageFormat);
         csvFileLocation.replace(csvFileLocation.find_last_of('.'), 4, ".csv");
         binFileLocation.replace(binFileLocation.find_last_of('.'), 4, ".bin");

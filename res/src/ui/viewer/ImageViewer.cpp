@@ -59,13 +59,10 @@ void showImages(){
         return;
     }
 
-    //TODO: Remove comment below in final build!
-    /*
     if (AssetManager::getCompressedFiles().empty()){
         cerr << "No files were compressed by the program!" << endl;
         return;
     }
-    */
 
     //3. Create the window and scene manager. Add the scene and change to it.
     sf::RenderWindow window(sf::VideoMode(0, 0),
@@ -82,18 +79,18 @@ void showImages(){
 
     //4. Load all of the images.
     auto& originalSet = AssetManager::getFiles();
-    //TODO: Replace with compressedFiles once SVD is finished.
-
-    for (auto& file : originalSet){
-        AssetManager::addFile(file, COMPRESSED);
-    }
-
     auto& compressedSet = AssetManager::getCompressedFiles();
 
     auto originalImages = originalSet.begin();
     auto compressedImages = compressedSet.begin();
 
     for (auto& file : originalSet){
+        if (!AssetManager::textureExists(file)){
+            AssetManager::addImage(AssetManager::getPrefix() + file);
+        }
+    }
+
+    for (auto& file : compressedSet){
         if (!AssetManager::textureExists(file)){
             AssetManager::addImage(AssetManager::getPrefix() + file);
         }
@@ -201,10 +198,13 @@ void updateText(const string& origFile, const string& compFile, Scene& scene){
     //2. Update the text.
     //TODO: Replace with actual Huffman size when available.
     const auto& fnNew = fs::path(origFile).filename().string();
-    const auto& fsOrigNew = (float)file_size(fs::path(origFile)) / (float)1024;
-    const auto& fsSVDNew = (float)file_size(fs::path(compFile)) / (float)1024;
+    string path = fs::path(AssetManager::getOutputFolder() + "svd/bin/" + fnNew).string();
+    path.replace(path.find_last_of('.'), 4, ".bin");
 
-    string huffmanName =  AssetManager::getOutputFolder() + "huffman/" + fs::path(origFile).filename().string();
+    const auto& fsOrigNew = (float)file_size(fs::path(origFile)) / (float)1024;
+    const auto& fsSVDNew = (float)file_size(fs::path(path)) / (float)1024;
+
+    string huffmanName =  AssetManager::getOutputFolder() + "huffman/bin/" + fs::path(origFile).filename().string();
     huffmanName.replace(huffmanName.find_last_of('.'), 4, ".bin");
     const auto fsHuffmanNew = file_size(fs::path(huffmanName)) / (float)1024;
 

@@ -109,7 +109,7 @@ string toBinary(unsigned  char a){
 
 }
 
-void traverseHuffmanTree(Tree* root, string prev, string toAppend, map<unsigned char, string> codemap)
+void traverseHuffmanTree(Tree* root, string prev, string toAppend, map<unsigned char, string>& codemap)
 {
 
     prev += toAppend;

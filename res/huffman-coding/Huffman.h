@@ -45,6 +45,6 @@ unsigned char* readFileIntoBuffer(const char* path, int& sz);
 void writeHeader(const char* path, map<unsigned char, string> codes, int paddedBits);
 unsigned char* readHeader(unsigned char* buffer, map<unsigned char, string>& codes, int& paddedBits, int& sz);
 void writeFileFromBuffer(const char* path, unsigned char* buffer, int sz, int flag);
-void traverseHuffmanTree(Tree* root, string prev, string toAppend, map<unsigned char, string> codemap);
+void traverseHuffmanTree(Tree* root, string prev, string toAppend, map<unsigned char, string>& codemap);
 
 #endif //SVDCOMPRESSION_HUFFMAN_H

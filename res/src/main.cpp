@@ -46,18 +46,10 @@ int main(int argc, char* argv[]) {
                             "Media Compression by iCompression: Qualitative Comparison", sf::Style::Close);
     AssetManager(getPrefix().data());
 
-    Image image;
-    image.loadFromFile("input/roman.jpg");
-    image.saveToFile("input/roman.tga");
-
-
     window.close();
 
     //Load the python interpreter to keep it alive for as long as possible.
     scope = new py::scoped_interpreter{};
-
-
-
 
     cout << "Media Compression by iCompression";
 
@@ -183,7 +175,7 @@ int main(int argc, char* argv[]) {
 
         else if (isCommand(command, args, "decompress")) {
             if (command == "help" || args.size() != 2) {
-                getHelp(COMPRESS);
+                getHelp(DECOMPRESS);
             }
 
             else if (args.size() == 2) {
@@ -193,7 +185,7 @@ int main(int argc, char* argv[]) {
 
         else if (isCommand(command, args, "convert")) {
             if (command == "help" || args.size() != 2) {
-                getHelp(COMPRESS);
+                getHelp(CONVERT);
             }
 
             else if (args.size() == 2) {
@@ -324,7 +316,7 @@ void huffmanAlgorithm(){
     for (auto& file : AssetManager::getFiles()){
         cout << "File: " << file << "...";
 
-        string output = AssetManager::getOutputFolder() + "huffman/" + fs::path(file).filename().string();
+        string output = AssetManager::getOutputFolder() + "huffman/bin/" + fs::path(file).filename().string();
         output.replace(output.find_last_of('.'), 4, ".bin");
         time_t begin, end;
         time(&begin);
@@ -333,11 +325,6 @@ void huffmanAlgorithm(){
 
         time(&end);
         cout << "Done! (Took " << difftime(end, begin) << " seconds)" << endl;
-        cout << endl << "Data in map: " << endl;
-
-        for (auto & iter : data){
-            cout << "{" << iter.first << "," << iter.second << ")" << endl;
-        }
     }
 }
 
