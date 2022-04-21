@@ -1,7 +1,7 @@
 #include "Huffman.h"
 
 //Compresses File using Huffman Coding
-void compressFile(const char* path,const char* output_path)
+void compressFile(const char* path,const char* output_path, map<unsigned char, string>& codes)
 {
 	map<unsigned char, string> codes;
 	int sz = 0;
@@ -29,11 +29,11 @@ void writeFileFromBuffer(const char* path, unsigned char* buffer, int sz, int fl
     FILE* fp;
     if (flag == 0)
     {
-        fp = fopen(path, "wb");
+        fopen_s(&fp,path, "wb");
     }
 
     else {
-        fp = fopen(path, "ab");
+        fopen_s(&fp, path, "ab");
     }
     //write buffer files
     fwrite(buffer, 1, sz, fp);
@@ -306,8 +306,8 @@ int CompareFiles(const char* pFname1,const char* pFname2)
 
 unsigned char* readFileIntoBuffer(const char* path, int& sz)
 {
-    //May change to r
-    FILE* fp = fopen(path, "rb");
+    FILE* fp;
+    fopen_s(&fp,path, "rb");
     if (fp == NULL)
     {
         cout << "File not found!" << endl;
