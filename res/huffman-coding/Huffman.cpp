@@ -3,7 +3,6 @@
 //Compresses File using Huffman Coding
 void compressFile(const char* path,const char* output_path, map<unsigned char, string>& codes)
 {
-	map<unsigned char, string> codes;
 	int sz = 0;
 	int paddedBits = 0;
 	map<unsigned char, int> freqtable;
